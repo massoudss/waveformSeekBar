@@ -6,8 +6,13 @@
 /.idea/modules.xml
 /.idea/workspace.xml
 /.idea/navEditor.xml
+.idea
 /.idea/assetWizardSettings.xml
 .DS_Store
 /build
 /captures
 .externalNativeBuild
+*.log
+bin/
+gen/
+out/

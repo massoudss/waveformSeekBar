@@ -60,7 +60,7 @@ waveformSeekBar.waveCornerRadius = Utils.dp(this,2)
 waveformSeekBar.waveGravity = WaveGravity.CENTER
 waveformSeekBar.waveBackgroundColor = ContextCompat.getColor(this,R.color.colorAccent)
 waveformSeekBar.waveProgressColor = ContextCompat.getColor(this,R.color.colorPrimary)
-waveformSeekBar.sample = sample data short array
+waveformSeekBar.sample = sample data Int array
 waveformSeekBar.setSampleFrom(AUDIO_FILE || AUDIO_PATH)
 ```
 
@@ -75,7 +75,7 @@ waveformSeekBar.setWaveCornerRadius(Utils.dp(this,2));
 waveformSeekBar.setWaveGravity(WaveGravity.CENTER);
 waveformSeekBar.setWaveBackgroundColor(ContextCompat.getColor(this,R.color.white));
 waveformSeekBar.setWaveProgressColor(ContextCompat.getColor(this,R.color.blue));
-waveformSeekBar.setSample(sample data short array);
+waveformSeekBar.setSample(sample data Int array);
 waveformSeekBar.setSampleFrom(AUDIO_FILE || AUDIO_PATH);
 ```
 
@@ -103,7 +103,7 @@ you can customize WaveformSeekBar, all of this attributes can change via xml or 
 |wave_gravity|Enum|`waveGravity`|Waves Gravity, default is `WaveGravity.CENTER`|
 |wave_background_color|Color|`waveBackgroundColor`|UnReached Waves color, default color is `Color.LTGRAY`|
 |wave_progress_color|Color|`waveProgressColor`|Reached Waves color, default color is `Color.WHITE`|
-| - |ShortInt|`sample`|Sample data for drawing waves, default is `null`|
+| - |IntArray|`sample`|Sample data for drawing waves, default is `null`|
 
 # License
 ```

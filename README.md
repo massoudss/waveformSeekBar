@@ -23,7 +23,7 @@ Add the dependency to your app build.gradle file
 
 ```
 dependencies {
-    implementation  'com.github.massoudss:waveformSeekBar:0.1' // Or compile in older versions
+    implementation  'com.github.massoudss:waveformSeekBar:1.1' // Or compile in older versions
 }
 ```
 
@@ -61,6 +61,7 @@ waveformSeekBar.waveGravity = WaveGravity.CENTER
 waveformSeekBar.waveBackgroundColor = ContextCompat.getColor(this,R.color.colorAccent)
 waveformSeekBar.waveProgressColor = ContextCompat.getColor(this,R.color.colorPrimary)
 waveformSeekBar.sample = sample data short array
+waveformSeekBar.setSampleFrom(AUDIO_FILE || AUDIO_PATH)
 ```
 
 ### Java
@@ -75,6 +76,7 @@ waveformSeekBar.setWaveGravity(WaveGravity.CENTER);
 waveformSeekBar.setWaveBackgroundColor(ContextCompat.getColor(this,R.color.white));
 waveformSeekBar.setWaveProgressColor(ContextCompat.getColor(this,R.color.blue));
 waveformSeekBar.setSample(sample data short array);
+waveformSeekBar.setSampleFrom(AUDIO_FILE || AUDIO_PATH);
 ```
 
 ### Progress Listener
@@ -101,7 +103,7 @@ you can customize WaveformSeekBar, all of this attributes can change via xml or 
 |wave_gravity|Enum|`waveGravity`|Waves Gravity, default is `WaveGravity.CENTER`|
 |wave_background_color|Color|`waveBackgroundColor`|UnReached Waves color, default color is `Color.LTGRAY`|
 |wave_progress_color|Color|`waveProgressColor`|Reached Waves color, default color is `Color.WHITE`|
-| - |ShortArray|`sample`|Sample data for drawing waves, default is `null`|
+| - |ShortInt|`sample`|Sample data for drawing waves, default is `null`|
 
 # License
 ```

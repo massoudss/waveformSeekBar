@@ -2,24 +2,22 @@ package com.masoudss.lib
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.RectF
+import android.graphics.*
+import android.os.Build
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import android.graphics.Bitmap
-import android.graphics.Shader
-import android.graphics.BitmapShader
 import android.view.ViewConfiguration
+import androidx.annotation.RequiresApi
+import com.masoudss.lib.exception.SampleDataException
+import java.io.File
 
 class WaveformSeekBar : View {
 
     private val mWavePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val mWaveRect = RectF()
     private val mProgressCanvas = Canvas()
-    private var mMaxValue = Utils.dp(context,2).toShort()
+    private var mMaxValue = Utils.dp(context, 2).toInt()
     private var mTouchDownX = 0F
     private var mScaledTouchSlop = ViewConfiguration.get(context).scaledTouchSlop
 
@@ -187,7 +185,17 @@ class WaveformSeekBar : View {
 
     var onProgressChanged : SeekBarOnProgressChanged? = null
 
-    var sample : ShortArray? = null
+    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
+    fun setSampleFrom(path: String) {
+        sample = WaveformOptions.getSampleFrom(path)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
+    fun setSampleFrom(file: File) {
+        sample = WaveformOptions.getSampleFrom(file)
+    }
+
+    var sample: IntArray? = null
         set(value){
             field = value
             invalidate()

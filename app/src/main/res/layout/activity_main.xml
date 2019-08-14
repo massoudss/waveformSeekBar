@@ -39,6 +39,17 @@
                     android:layout_gravity="right"
                     android:background="?attr/actionBarItemBackground"/>
 
+            <ImageView
+                    android:id="@+id/icImport"
+                    android:layout_width="?attr/actionBarSize"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_import"
+                    android:padding="12dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_gravity="right"
+                    android:background="?attr/actionBarItemBackground"/>
+
         </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>

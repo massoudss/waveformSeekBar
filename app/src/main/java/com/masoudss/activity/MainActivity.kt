@@ -1,38 +1,47 @@
-package com.masoudss
+package com.masoudss.activity
 
-import androidx.appcompat.app.AppCompatActivity
+import android.app.Activity
+import android.app.ProgressDialog
+import android.content.Intent
+import android.database.Cursor
+import android.net.Uri
 import android.os.Bundle
 import android.widget.RadioButton
 import android.widget.SeekBar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.masoudss.lib.SeekBarOnProgressChanged
-import com.masoudss.lib.Utils
-import com.masoudss.lib.WaveGravity
-import com.masoudss.lib.WaveformSeekBar
+import com.masoudss.lib.*
 import kotlinx.android.synthetic.main.activity_main.*
-import android.content.Intent
-import android.net.Uri
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
+import java.util.*
+import android.provider.MediaStore
+import com.masoudss.R
 
 
 class MainActivity : AppCompatActivity() {
+
+    private val REQ_CODE_PICK_SOUND_FILE = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        waveformSeekBar.progress = 33
-        waveformSeekBar.waveWidth = Utils.dp(this,5)
-        waveformSeekBar.waveGap = Utils.dp(this,2)
-        waveformSeekBar.waveMinHeight = Utils.dp(this,5)
-        waveformSeekBar.waveCornerRadius = Utils.dp(this,2)
-        waveformSeekBar.waveGravity = WaveGravity.CENTER
-        waveformSeekBar.waveBackgroundColor = ContextCompat.getColor(this,R.color.white)
-        waveformSeekBar.waveProgressColor = ContextCompat.getColor(this,R.color.blue)
-        waveformSeekBar.sample = Utils.getDummyWaveSample()
-        waveformSeekBar.onProgressChanged = object : SeekBarOnProgressChanged {
-            override fun onProgressChanged(waveformSeekBar: WaveformSeekBar, progress: Int, fromUser: Boolean) {
-                if (fromUser)
-                    waveProgress.progress = progress
+        waveformSeekBar.apply {
+            progress = 33
+            waveWidth = Utils.dp(this@MainActivity, 5)
+            waveGap = Utils.dp(this@MainActivity, 2)
+            waveMinHeight = Utils.dp(this@MainActivity, 5)
+            waveCornerRadius = Utils.dp(this@MainActivity, 2)
+            waveGravity = WaveGravity.CENTER
+            waveBackgroundColor = ContextCompat.getColor(this@MainActivity, R.color.white)
+            waveProgressColor = ContextCompat.getColor(this@MainActivity, R.color.blue)
+            sample = getDummyWaveSample()
+            onProgressChanged = object : SeekBarOnProgressChanged {
+                override fun onProgressChanged(waveformSeekBar: WaveformSeekBar, progress: Int, fromUser: Boolean) {
+                    if (fromUser)
+                        waveProgress.progress = progress
+                }
             }
         }
 
@@ -92,9 +101,9 @@ class MainActivity : AppCompatActivity() {
             val radioButton = waveColorRadioGroup.findViewById(checkedId) as RadioButton
             val index = waveColorRadioGroup.indexOfChild(radioButton)
             waveformSeekBar.waveBackgroundColor = when (index){
-                0 -> ContextCompat.getColor(this,R.color.pink)
-                1 -> ContextCompat.getColor(this,R.color.yellow)
-                else -> ContextCompat.getColor(this,R.color.white)
+                0 -> ContextCompat.getColor(this, R.color.pink)
+                1 -> ContextCompat.getColor(this, R.color.yellow)
+                else -> ContextCompat.getColor(this, R.color.white)
             }
         }
 
@@ -103,9 +112,9 @@ class MainActivity : AppCompatActivity() {
             val radioButton = progressColorRadioGroup.findViewById(checkedId) as RadioButton
             val index = progressColorRadioGroup.indexOfChild(radioButton)
             waveformSeekBar.waveProgressColor = when (index){
-                0 -> ContextCompat.getColor(this,R.color.red)
-                1 -> ContextCompat.getColor(this,R.color.blue)
-                else -> ContextCompat.getColor(this,R.color.green)
+                0 -> ContextCompat.getColor(this, R.color.red)
+                1 -> ContextCompat.getColor(this, R.color.blue)
+                else -> ContextCompat.getColor(this, R.color.green)
             }
         }
 
@@ -115,5 +124,41 @@ class MainActivity : AppCompatActivity() {
             i.data = Uri.parse(url)
             startActivity(i)
         }
+
+        icImport.setOnClickListener {
+            val intent = Intent(this@MainActivity,SelectAudioActivity::class.java)
+            startActivityForResult(intent,REQ_CODE_PICK_SOUND_FILE)
+        }
     }
+
+    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (data!= null && requestCode == REQ_CODE_PICK_SOUND_FILE && resultCode == Activity.RESULT_OK) {
+            val path = data.getStringExtra("path")
+
+            val progressDialog = ProgressDialog(this@MainActivity)
+            progressDialog.setMessage("Please wait...")
+            progressDialog.show()
+
+            doAsync {
+
+                val waves = WaveformOptions.getSampleFrom(path)
+
+                uiThread {
+                    waveformSeekBar?.sample = waves
+                    progressDialog.dismiss()
+                }
+            }
+        }
+    }
+
+    private fun getDummyWaveSample(): IntArray {
+        val data = IntArray(50)
+        for (i in 0 until data.size)
+            data[i] = Random().nextInt(data.size)
+
+        return data
+    }
+
+
 }

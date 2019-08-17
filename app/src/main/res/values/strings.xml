@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">WaveFormSeekBar</string>
+    <string name="permission_error">Permission Denied :(</string>
+    <string name="message_waiting">Please wait...</string>
 </resources>

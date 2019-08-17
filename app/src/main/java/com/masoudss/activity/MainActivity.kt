@@ -1,10 +1,12 @@
 package com.masoudss.activity
 
+import android.Manifest
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Intent
-import android.database.Cursor
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.widget.RadioButton
 import android.widget.SeekBar
@@ -15,13 +17,14 @@ import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import java.util.*
-import android.provider.MediaStore
+import android.widget.Toast
 import com.masoudss.R
 
 
 class MainActivity : AppCompatActivity() {
 
     private val REQ_CODE_PICK_SOUND_FILE = 1
+    private val REQ_CODE_STORAGE_PERMMISION = 2
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -126,8 +129,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         icImport.setOnClickListener {
-            val intent = Intent(this@MainActivity,SelectAudioActivity::class.java)
-            startActivityForResult(intent,REQ_CODE_PICK_SOUND_FILE)
+            checkStoragePermission()
         }
     }
 
@@ -137,7 +139,7 @@ class MainActivity : AppCompatActivity() {
             val path = data.getStringExtra("path")
 
             val progressDialog = ProgressDialog(this@MainActivity)
-            progressDialog.setMessage("Please wait...")
+            progressDialog.setMessage(getString(R.string.message_waiting))
             progressDialog.show()
 
             doAsync {
@@ -150,6 +152,53 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun checkStoragePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val hasReadPermission = checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+            val hasWritePermission = checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+
+            val permissions = ArrayList<String>()
+
+            if (hasReadPermission != PackageManager.PERMISSION_GRANTED)
+                permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+
+            if (hasWritePermission != PackageManager.PERMISSION_GRANTED)
+                permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+
+            if (permissions.isNotEmpty())
+                requestPermissions(permissions.toTypedArray(), REQ_CODE_STORAGE_PERMMISION)
+            else
+                launchSelectAudioActivity()
+
+        }else
+            launchSelectAudioActivity()
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        if (requestCode == REQ_CODE_STORAGE_PERMMISION) {
+            var denied = false
+            for (i in permissions.indices)
+                if (grantResults[i] == PackageManager.PERMISSION_DENIED){
+                    denied = true
+                    break
+                }
+
+            if (denied)
+                Toast.makeText(this@MainActivity,getString(R.string.permission_error),Toast.LENGTH_SHORT).show()
+            else
+                launchSelectAudioActivity()
+
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        }
+
+    }
+
+    private fun launchSelectAudioActivity(){
+        val intent = Intent(this@MainActivity,SelectAudioActivity::class.java)
+        startActivityForResult(intent,REQ_CODE_PICK_SOUND_FILE)
     }
 
     private fun getDummyWaveSample(): IntArray {

@@ -11,8 +11,12 @@ import android.view.ViewConfiguration
 import androidx.annotation.RequiresApi
 import com.masoudss.lib.exception.SampleDataException
 import java.io.File
+import kotlin.math.abs
 
 class WaveformSeekBar : View {
+
+    private var mCanvasWidth = 0
+    private var mCanvasHeight = 0
 
     private val mWavePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val mWaveRect = RectF()
@@ -54,6 +58,12 @@ class WaveformSeekBar : View {
         ta.recycle()
     }
 
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        mCanvasWidth = w
+        mCanvasHeight = h
+    }
+
     @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas) {
 
@@ -76,7 +86,7 @@ class WaveformSeekBar : View {
             val top : Float = when(waveGravity){
                 WaveGravity.TOP -> paddingTop.toFloat()
                 WaveGravity.CENTER -> paddingTop+getAvailableHeight()/2F - waveHeight/2F
-                WaveGravity.BOTTOM -> height - paddingBottom - waveHeight
+                WaveGravity.BOTTOM -> mCanvasHeight - paddingBottom - waveHeight
             }
 
             mWaveRect.set(lastWaveRight, top, lastWaveRight+waveWidth, top + waveHeight)
@@ -137,7 +147,7 @@ class WaveformSeekBar : View {
                     updateProgress(event)
             }
             MotionEvent.ACTION_UP ->{
-                if (Math.abs(event.x - mTouchDownX) > mScaledTouchSlop)
+                if (abs(event.x - mTouchDownX) > mScaledTouchSlop)
                     updateProgress(event)
 
                 performClick()
@@ -180,8 +190,8 @@ class WaveformSeekBar : View {
         return true
     }
 
-    private fun getAvailableWith() = width-paddingLeft-paddingRight
-    private fun getAvailableHeight() = height-paddingTop-paddingBottom
+    private fun getAvailableWith() = mCanvasWidth-paddingLeft-paddingRight
+    private fun getAvailableHeight() = mCanvasHeight-paddingTop-paddingBottom
 
     var onProgressChanged : SeekBarOnProgressChanged? = null
 

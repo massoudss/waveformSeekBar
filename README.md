@@ -23,7 +23,7 @@ Add the dependency to your app build.gradle file
 
 ```
 dependencies {
-    implementation  'com.github.massoudss:waveformSeekBar:1.1' // Or compile in older versions
+    implementation  'com.github.massoudss:waveformSeekBar:1.1.1' // Or compile in older versions
 }
 ```
 

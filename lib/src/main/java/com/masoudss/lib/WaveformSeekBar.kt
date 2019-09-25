@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewConfiguration
 import androidx.annotation.RequiresApi
 import com.masoudss.lib.exception.SampleDataException
+import com.masoudss.lib.soundParser.SoundFile
 import java.io.File
 import kotlin.math.abs
 
@@ -196,14 +197,22 @@ class WaveformSeekBar : View {
     var onProgressChanged : SeekBarOnProgressChanged? = null
 
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
-    fun setSampleFrom(path: String) {
-        sample = WaveformOptions.getSampleFrom(path)
+    fun setSampleFrom(path: String, ignoreExtension: Boolean = false) {
+        sample = WaveformOptions.getSampleFrom(path, ignoreExtension)
     }
 
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
-    fun setSampleFrom(file: File) {
-        sample = WaveformOptions.getSampleFrom(file)
+    fun setSampleFrom(file: File, ignoreExtension: Boolean = false) {
+        sample = WaveformOptions.getSampleFrom(file, ignoreExtension)
     }
+
+    fun addCustomExtension(extension: String) = WaveformOptions.addCustomExtension(extension)
+
+    fun removeCustomExtension(extension: String) = WaveformOptions.removeCustomExtension(extension)
+
+    fun addCustomExtensions(extensions: List<String>) = WaveformOptions.addCustomExtensions(extensions)
+
+    fun removeCustomExtensions(extensions: List<String>) = WaveformOptions.removeCustomExtensions(extensions)
 
     var sample: IntArray? = null
         set(value){

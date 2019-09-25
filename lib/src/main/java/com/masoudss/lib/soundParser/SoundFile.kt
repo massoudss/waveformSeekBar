@@ -13,6 +13,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.ShortBuffer
 import java.util.*
+import kotlin.collections.ArrayList
 
 @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
 class SoundFile private constructor() {
@@ -40,11 +41,25 @@ class SoundFile private constructor() {
     companion object {
 
         private val supportedExtensions = arrayOf("mp3", "wav", "3gpp", "3gp", "amr", "aac", "m4a", "ogg")
+        private val additionalExtensions = ArrayList<String>()
+
+        fun addCustomExtension(extension: String) = additionalExtensions.add(extension)
+
+        fun removeCustomExtension(extension: String) = additionalExtensions.remove(extension)
+
+        fun addCustomExtensions(extensions: List<String>) = additionalExtensions.addAll(extensions)
+
+        fun removeCustomExtensions(extensions: List<String>) = additionalExtensions.removeAll(extensions)
 
         private fun isFilenameSupported(filename: String): Boolean {
-            val extensions = supportedExtensions
-            for (i in extensions.indices) {
-                if (filename.endsWith("." + extensions[i])) {
+
+            for (i in supportedExtensions.indices) {
+                if (filename.endsWith("." + supportedExtensions[i])) {
+                    return true
+                }
+            }
+            for (i in additionalExtensions.indices) {
+                if (filename.endsWith("." + additionalExtensions[i])) {
                     return true
                 }
             }
@@ -52,8 +67,8 @@ class SoundFile private constructor() {
         }
 
         @Throws(FileNotFoundException::class, IOException::class, InvalidInputException::class)
-        fun create(fileName: String): SoundFile? {
-            if (!isFilenameSupported(fileName))
+        fun create(fileName: String, ignoreExtension: Boolean = false): SoundFile? {
+            if (!ignoreExtension && !isFilenameSupported(fileName))
                 throw InvalidInputException("Not supported file extension.")
 
             val f = File(fileName)

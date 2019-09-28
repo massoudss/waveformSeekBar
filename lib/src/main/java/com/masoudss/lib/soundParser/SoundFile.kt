@@ -20,7 +20,6 @@ class SoundFile private constructor() {
 
     private var mProgressListener: ProgressListener? = null
     private var mInputFile: File? = null
-    private var filetype: String? = null
     private var fileSizeBytes = 0
     private var avgBitrateKbps = 0
     private var sampleRate = 0
@@ -75,14 +74,6 @@ class SoundFile private constructor() {
             if (!f.exists()) {
                 throw FileNotFoundException(fileName)
             }
-            val name = f.name.toLowerCase()
-            val components = name.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            if (components.size < 2) {
-                return null
-            }
-            if (!Arrays.asList(*supportedExtensions).contains(components[components.size - 1])) {
-                return null
-            }
             val soundFile = SoundFile()
             soundFile.readFile(f)
             return soundFile
@@ -94,8 +85,6 @@ class SoundFile private constructor() {
         var format: MediaFormat? = null
 
         mInputFile = inputFile
-        val components = mInputFile!!.path.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        filetype = components[components.size - 1]
         fileSizeBytes = mInputFile!!.length().toInt()
         extractor.setDataSource(mInputFile!!.path)
         val numTracks = extractor.trackCount

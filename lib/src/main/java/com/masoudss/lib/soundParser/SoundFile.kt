@@ -14,6 +14,8 @@ import java.nio.ByteOrder
 import java.nio.ShortBuffer
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.abs
+import kotlin.math.sqrt
 
 @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
 class SoundFile private constructor() {
@@ -246,13 +248,13 @@ class SoundFile private constructor() {
                 value = 0
                 for (k in 0 until channels)
                     if (mDecodedSamples!!.remaining() > 0)
-                        value += Math.abs(mDecodedSamples!!.get().toInt())
+                        value += abs(mDecodedSamples!!.get().toInt())
                 value /= channels
                 if (gain < value)
                     gain = value
                 j++
             }
-            frameGains!![i] = Math.sqrt(gain.toDouble()).toInt()
+            frameGains!![i] = sqrt(gain.toDouble()).toInt()
             mFrameLens!![i] = frameLens
             mFrameOffsets!![i] = (i.toFloat() * (1000 * avgBitrateKbps / 8).toFloat() * (samplesPerFrame.toFloat() / sampleRate)).toInt()
             i++

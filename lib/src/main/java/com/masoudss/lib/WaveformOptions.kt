@@ -8,12 +8,14 @@ import java.io.File
 object WaveformOptions {
 
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
+    @JvmStatic
     fun getSampleFrom(file: File, ignoreExtension: Boolean = false): IntArray? {
         val soundFile = SoundFile.create(file.absolutePath, ignoreExtension)
         return soundFile?.frameGains
     }
 
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
+    @JvmStatic
     fun getSampleFrom(path: String, ignoreExtension: Boolean = false): IntArray? {
         val soundFile = SoundFile.create(path, ignoreExtension)
         return soundFile?.frameGains

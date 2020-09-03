@@ -3,22 +3,29 @@ package com.masoudss.lib
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.masoudss.lib.soundParser.SoundFile
+import linc.com.amplituda.Amplituda
 import java.io.File
 
 object WaveformOptions {
 
+    private val amplituda by lazy { Amplituda() }
+
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
     @JvmStatic
-    fun getSampleFrom(file: File, ignoreExtension: Boolean = false): IntArray? {
-        val soundFile = SoundFile.create(file.absolutePath, ignoreExtension)
-        return soundFile?.frameGains
+    fun getSampleFrom(file: File, onSuccess:(samples: IntArray) -> Unit) {
+        amplituda.fromFile(file)
+            .amplitudesAsList {
+                onSuccess(it.toIntArray())
+            }
     }
 
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
     @JvmStatic
-    fun getSampleFrom(path: String, ignoreExtension: Boolean = false): IntArray? {
-        val soundFile = SoundFile.create(path, ignoreExtension)
-        return soundFile?.frameGains
+    fun getSampleFrom(path: String, onSuccess: (IntArray) -> Unit) {
+        amplituda.fromPath(path)
+            .amplitudesAsList {
+                onSuccess(it.toIntArray())
+            }
     }
 
     fun addCustomExtension(extension: String) = SoundFile.addCustomExtension(extension)

@@ -144,7 +144,11 @@ class MainActivity : AppCompatActivity() {
 
             doAsync {
 
-                val waves = WaveformOptions.getSampleFrom(path)
+                var waves: IntArray = intArrayOf()
+
+                WaveformOptions.getSampleFrom(path) {
+                    waves = it
+                }
 
                 uiThread {
                     waveformSeekBar?.sample = waves

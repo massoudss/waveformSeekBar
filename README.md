@@ -23,12 +23,24 @@ Add the dependency to your app build.gradle file
 
 ```
 dependencies {
-    implementation  'com.github.massoudss:waveformSeekBar:1.1.4' // Or compile in older versions
+    implementation  'com.github.massoudss:waveformSeekBar:1.1.5'
 }
 ```
 
 And then sync your gradle.
 
+## Reduce size library size
+Add ``` android:extractNativeLibs="false" ``` to application in the Manifest.xml
+
+``` xml
+<application
+      . . .
+    android:extractNativeLibs="false"
+      . . . >
+    <activity . . ./>
+</application>
+```
+You should reduce size, because this fork use <a href="https://github.com/lincollincol/Amplituda">Amplituda</a> library for fast audio processing.
 
 ## How to use
 You can simply use this View like other Views in android,

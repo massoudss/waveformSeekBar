@@ -10,7 +10,7 @@ Android Waveform SeekBar library
 ## How to add
 
 Add below lines in your root build.gradle at the end of repositories
-
+### Gradle
 ```
 allprojects {
   repositories {
@@ -23,11 +23,28 @@ Add the dependency to your app build.gradle file
 
 ```
 dependencies {
-    implementation  'com.github.massoudss:waveformSeekBar:1.1.5'
+    implementation  'com.github.lincollincol:waveformSeekBar:1.1.5'
 }
 ```
 
 And then sync your gradle.
+### Maven
+``` xml
+<repositories>
+  <repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+  </repository>
+</repositories>
+```
+``` xml
+<dependency>
+  <groupId>com.github.lincollincol</groupId>
+  <artifactId>waveformSeekBar</artifactId>
+  <version>1.1.5</version>
+</dependency>
+```
+
 
 ## Reduce library size
 Add ``` android:extractNativeLibs="false" ``` to application in the Manifest.xml

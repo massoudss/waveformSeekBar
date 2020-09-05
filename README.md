@@ -29,7 +29,7 @@ dependencies {
 
 And then sync your gradle.
 
-## Reduce size library size
+## Reduce library size
 Add ``` android:extractNativeLibs="false" ``` to application in the Manifest.xml
 
 ``` xml

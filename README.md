@@ -3,6 +3,8 @@
 # WaveformSeekBar
 Android Waveform SeekBar library
 
+This library works with api level 21 and higher
+
 <img src="./files/preview.png" width="300">
 <img src="./files/preview.gif" width="300">
 
@@ -23,7 +25,7 @@ Add the dependency to your app build.gradle file
 
 ```
 dependencies {
-    implementation  'com.github.massoudss:waveformSeekBar:1.1.4' // Or compile in older versions
+    implementation  'com.github.massoudss:waveformSeekBar:2.0.0' // Or compile in older versions
 }
 ```
 

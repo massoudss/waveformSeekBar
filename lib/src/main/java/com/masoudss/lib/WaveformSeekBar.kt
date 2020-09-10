@@ -195,28 +195,6 @@ class WaveformSeekBar : View {
 
     var onProgressChanged : SeekBarOnProgressChanged? = null
 
-    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
-    fun setSampleFrom(path: String, ignoreExtension: Boolean = false) {
-        WaveformOptions.getSampleFrom(path) {
-             sample = it
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
-    fun setSampleFrom(file: File, ignoreExtension: Boolean = false) {
-        WaveformOptions.getSampleFrom(file) {
-            sample = it
-        }
-    }
-
-    fun addCustomExtension(extension: String) = WaveformOptions.addCustomExtension(extension)
-
-    fun removeCustomExtension(extension: String) = WaveformOptions.removeCustomExtension(extension)
-
-    fun addCustomExtensions(extensions: List<String>) = WaveformOptions.addCustomExtensions(extensions)
-
-    fun removeCustomExtensions(extensions: List<String>) = WaveformOptions.removeCustomExtensions(extensions)
-
     var sample: IntArray? = null
         set(value){
             field = value

@@ -107,6 +107,18 @@ you can customize WaveformSeekBar, all of this attributes can change via xml or 
 |wave_progress_color|Color|`waveProgressColor`|Reached Waves color, default color is `Color.WHITE`|
 | - |IntArray|`sample`|Sample data for drawing waves, default is `null`|
 
+# Reduce size
+Add ``` android:extractNativeLibs="false" ``` to application in the Manifest.xml
+
+``` xml
+<application
+      . . .
+    android:extractNativeLibs="false"
+      . . . >
+    <activity . . ./>
+</application>
+```
+
 # License
 ```
 Licensed under the Apache License, Version 2.0 (the "License");

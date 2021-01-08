@@ -146,7 +146,9 @@ class MainActivity : AppCompatActivity() {
 
                 var waves: IntArray = intArrayOf()
 
-                WaveformOptions.getSampleFrom(path) {
+                WaveformOptions.init(this@MainActivity)
+
+                WaveformOptions.getSampleFrom(path!!) {
                     waves = it
                 }
 

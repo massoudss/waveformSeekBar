@@ -1,15 +1,23 @@
 package com.masoudss.lib
 
+import android.content.Context
 import linc.com.amplituda.Amplituda
 import java.io.File
 
 object WaveformOptions {
 
-    private val amplituda by lazy { Amplituda() }
+    private var amplituda: Amplituda? = null
+
+    @JvmStatic
+    fun init(context: Context) {
+        if(amplituda == null) {
+            amplituda = Amplituda(context)
+        }
+    }
 
     @JvmStatic
     fun getSampleFrom(file: File, onSuccess:(samples: IntArray) -> Unit) {
-        amplituda.fromFile(file)
+        amplituda!!.fromFile(file)
             .amplitudesAsList {
                 onSuccess(it.toIntArray())
             }
@@ -17,7 +25,7 @@ object WaveformOptions {
 
     @JvmStatic
     fun getSampleFrom(path: String, onSuccess: (IntArray) -> Unit) {
-        amplituda.fromPath(path)
+        amplituda!!.fromPath(path)
             .amplitudesAsList {
                 onSuccess(it.toIntArray())
             }

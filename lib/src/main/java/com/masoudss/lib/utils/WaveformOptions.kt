@@ -4,7 +4,7 @@ import android.content.Context
 import linc.com.amplituda.Amplituda
 import java.io.File
 
-object WaveformOptions {
+internal object WaveformOptions {
 
     private var amplituda: Amplituda? = null
 

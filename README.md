@@ -81,6 +81,9 @@ waveformSeekBar.setSample(sample data Int array);
 waveformSeekBar.setSampleFrom(AUDIO_FILE || AUDIO_PATH);
 ```
 
+### Warning 
+waveformSeekBar.setSampleFrom(audio) can block your main(ui) thread! Please run this function in the background thread.
+
 ### Progress Listener
 ```
 waveformSeekBar.onProgressChanged = object : SeekBarOnProgressChanged {
@@ -93,7 +96,7 @@ waveformSeekBar.onProgressChanged = object : SeekBarOnProgressChanged {
 
 ## View Properties 
 
-you can customize WaveformSeekBar, all of this attributes can change via xml or code (runtime)
+You can customize WaveformSeekBar, all of this attributes can change via xml or code (runtime)
 
 |Attribute|Type|Kotlin|Description|
 |:---:|:---:|:---:|:---:|

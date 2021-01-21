@@ -1,4 +1,4 @@
-package com.masoudss.lib
+package com.masoudss.lib.utils
 
 enum class WaveGravity {
     TOP,

@@ -1,4 +1,4 @@
-package com.masoudss.lib
+package com.masoudss.lib.utils
 
 import android.content.Context
 import linc.com.amplituda.Amplituda

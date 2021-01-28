@@ -3,13 +3,15 @@ package com.masoudss.lib
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
-import android.os.Build
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
-import androidx.annotation.RequiresApi
 import com.masoudss.lib.exception.SampleDataException
+import com.masoudss.lib.utils.ThreadBlocking
+import com.masoudss.lib.utils.Utils
+import com.masoudss.lib.utils.WaveGravity
+import com.masoudss.lib.utils.WaveformOptions
 import java.io.File
 import kotlin.math.abs
 
@@ -56,6 +58,7 @@ class WaveformSeekBar : View {
         }
 
         ta.recycle()
+        WaveformOptions.init(context)
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -251,4 +254,14 @@ class WaveformSeekBar : View {
           field = value
             invalidate()
         }
+
+    @ThreadBlocking
+    fun setSampleFrom(audio: File) = setSampleFrom(audio.path)
+
+    @ThreadBlocking
+    fun setSampleFrom(path: String) {
+        WaveformOptions.getSampleFrom(path) {
+            sample = it
+        }
+    }
 }

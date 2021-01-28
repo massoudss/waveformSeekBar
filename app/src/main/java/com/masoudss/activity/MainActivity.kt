@@ -19,6 +19,8 @@ import org.jetbrains.anko.uiThread
 import java.util.*
 import android.widget.Toast
 import com.masoudss.R
+import com.masoudss.lib.utils.Utils
+import com.masoudss.lib.utils.WaveGravity
 
 
 class MainActivity : AppCompatActivity() {
@@ -50,7 +52,7 @@ class MainActivity : AppCompatActivity() {
 
         waveWidth.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                waveformSeekBar.waveWidth = progress/100F*Utils.dp(this@MainActivity,20)
+                waveformSeekBar.waveWidth = progress/100F* Utils.dp(this@MainActivity,20)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -60,7 +62,7 @@ class MainActivity : AppCompatActivity() {
 
         waveCornerRadius.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                waveformSeekBar.waveCornerRadius = progress/100F*Utils.dp(this@MainActivity,10)
+                waveformSeekBar.waveCornerRadius = progress/100F* Utils.dp(this@MainActivity,10)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -70,7 +72,7 @@ class MainActivity : AppCompatActivity() {
 
         waveGap.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                waveformSeekBar.waveGap = progress/100F*Utils.dp(this@MainActivity,10)
+                waveformSeekBar.waveGap = progress/100F* Utils.dp(this@MainActivity,10)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -142,18 +144,11 @@ class MainActivity : AppCompatActivity() {
             progressDialog.setMessage(getString(R.string.message_waiting))
             progressDialog.show()
 
+
             doAsync {
-
-                var waves: IntArray = intArrayOf()
-
-                WaveformOptions.init(this@MainActivity)
-
-                WaveformOptions.getSampleFrom(path!!) {
-                    waves = it
-                }
+                waveformSeekBar.setSampleFrom(path!!)
 
                 uiThread {
-                    waveformSeekBar?.sample = waves
                     progressDialog.dismiss()
                 }
             }

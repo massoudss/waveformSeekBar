@@ -39,6 +39,7 @@ just add ``WaveformSeekBar`` in your java/kotlin code or xml.
 ```
 <com.masoudss.lib.WaveformSeekBar
         app:wave_progress="33"
+        app:wave_max_progress="100"
         app:wave_width="5dp"
         app:wave_gap="2dp"
         app:wave_min_height="5dp"
@@ -55,6 +56,7 @@ just add ``WaveformSeekBar`` in your java/kotlin code or xml.
 ```
 val waveformSeekBar = WaveformSeekBar(yourContext)
 waveformSeekBar.progress = 33
+waveformSeekBar.maxProgress = 100
 waveformSeekBar.waveWidth = Utils.dp(this,5)
 waveformSeekBar.waveGap = Utils.dp(this,2)
 waveformSeekBar.waveMinHeight = Utils.dp(this,5)
@@ -70,6 +72,7 @@ waveformSeekBar.setSampleFrom(AUDIO_FILE || AUDIO_PATH)
 ```
 WaveformSeekBar waveformSeekBar = new WaveformSeekBar(yourContext);
 waveformSeekBar.setProgress(33);
+waveformSeekBar.setMaxProgress(100);
 waveformSeekBar.setWaveWidth(Utils.dp(this,5));
 waveformSeekBar.setWaveGap(Utils.dp(this,2));
 waveformSeekBar.setWaveMinHeight(Utils.dp(this,5));

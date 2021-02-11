@@ -66,6 +66,7 @@
 
             <com.masoudss.lib.WaveformSeekBar
                     app:wave_progress="33"
+                    app:wave_max_progress="100"
                     app:wave_width="5dp"
                     app:wave_gap="2dp"
                     app:wave_min_height="5dp"
@@ -88,6 +89,7 @@
                     android:text="Wave Width"
                     android:layout_gravity="center"/>
             <SeekBar
+                    android:min="1"
                     android:max="100"
                     android:progress="50"
                     android:id="@+id/waveWidth"
@@ -138,6 +140,20 @@
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"/>
 
+            <TextView
+                android:layout_marginTop="16dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Maximum Progress"
+                android:layout_gravity="center"/>
+            <SeekBar
+                android:min="1"
+                android:max="200"
+                android:progress="100"
+                android:id="@+id/waveMaxProgress"
+                android:layout_gravity="center"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"/>
 
             <LinearLayout
                     android:layout_marginTop="16dp"

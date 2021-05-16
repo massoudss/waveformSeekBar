@@ -21,7 +21,7 @@ import android.widget.Toast
 import com.masoudss.R
 import com.masoudss.lib.utils.Utils
 import com.masoudss.lib.utils.WaveGravity
-import linc.com.amplituda.Amplituda
+//import linc.com.amplituda.Amplituda
 
 
 class MainActivity : AppCompatActivity() {

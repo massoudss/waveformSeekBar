@@ -1,52 +1,61 @@
 package com.masoudss.lib.utils
 
 import android.content.Context
+import com.masoudss.lib.exception.AmplitudaNotFoundException
+import java.lang.ClassCastException
 import java.lang.reflect.InvocationHandler
-import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 
 internal object ExternalAmplituda {
 
-    /**
-     * @param args: args[0] - context || args[1] - path to file
-     */
-    fun run(result: (IntArray) -> Unit, vararg args: Any) : ExternalAmplituda {
-        val classs = Class.forName("linc.com.amplituda.Amplituda")
-            .getDeclaredConstructor(Context::class.java)
-            .newInstance(args[0])
+    private const val CONTEXT = 0
+    private const val PATH = 1
+    private const val SINGLE_LINE_SEQUENCE_FORMAT = 0
 
-        val callback = Proxy.newProxyInstance(
-            Class.forName("linc.com.amplituda.Amplituda\$StringCallback").classLoader,
-            arrayOf(Class.forName("linc.com.amplituda.Amplituda\$StringCallback")),
-            InvocationHandler { any, method, arrayOfAnys ->
-                arrayOfAnys.forEach {
-                    result(it.toString()
-                        .split(" ")
-                        .toList()
+    /**
+     * @param args:
+     *      args[0] - context
+     *      args[1] - path to file
+     */
+    @JvmStatic
+    @Throws(AmplitudaNotFoundException::class)
+    fun run(result: (IntArray) -> Unit, vararg args: Any) {
+        val amplituda: Any
+
+        // Check Amplituda dependency
+        try {
+            amplituda = Class.forName("linc.com.amplituda.Amplituda")
+                .getDeclaredConstructor(Context::class.java)
+                .newInstance(args[CONTEXT])
+        } catch (notFound: ClassNotFoundException) {
+            throw AmplitudaNotFoundException()
+        }
+
+        // Callback class for result
+        val stringCallback = Class.forName("linc.com.amplituda.Amplituda\$StringCallback")
+
+        // Handle result in this callback
+        val amplitudesStringResultCallback = Proxy.newProxyInstance(stringCallback.classLoader, arrayOf(stringCallback),
+            InvocationHandler { _, _, resultParams ->
+                resultParams.forEach { amplitudaString ->
+                    // Convert string sequence to IntArray
+                    result(amplitudaString.toString()
+                        .split(" ") // Default delimiter
                         .map { it.toInt() }
                         .toIntArray()
                     )
                 }
             })
 
-        val pathMethod: Method = classs::class.java.getMethod(
+        // Set input audio path
+        amplituda::class.java.getMethod(
             "fromPath",
             String::class.javaObjectType
-        )
+        ).invoke(amplituda, args[PATH])
 
-        pathMethod.invoke(classs, args[1])
-
-        classs::class.java.declaredClasses.forEach {
-            println(it.name)
-        }
-
-        val amplitudesListMethod: Method = classs::class.java.methods.find {
+        // Process audio
+        amplituda::class.java.methods.find {
             it.name == "amplitudesAsSequence"
-        }!!
-
-        amplitudesListMethod.invoke(classs, 0, callback)
-
-        return this
+        }!!.invoke(amplituda, SINGLE_LINE_SEQUENCE_FORMAT, amplitudesStringResultCallback)
     }
-
 }

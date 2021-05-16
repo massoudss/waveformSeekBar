@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewConfiguration
 import androidx.annotation.Keep
 import androidx.annotation.RestrictTo
+import com.masoudss.lib.exception.AmplitudaNotFoundException
 import com.masoudss.lib.exception.SampleDataException
 import com.masoudss.lib.utils.ThreadBlocking
 import com.masoudss.lib.utils.Utils
@@ -261,11 +262,13 @@ class WaveformSeekBar : View {
     }
 
     @ThreadBlocking
+    @Throws(AmplitudaNotFoundException::class)
     fun setSampleFrom(audio: File) {
         setSampleFrom(audio.path)
     }
 
     @ThreadBlocking
+    @Throws(AmplitudaNotFoundException::class)
     fun setSampleFrom(path: String) {
         WaveformOptions.getSampleFrom(context, path) {
             sample = it

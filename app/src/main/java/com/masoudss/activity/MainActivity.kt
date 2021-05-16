@@ -91,6 +91,17 @@ class MainActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
+        waveMaxProgress.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                waveProgress.max = progress
+                waveformSeekBar.maxProgress = progress.toFloat()
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+
         gravityRadioGroup.setOnCheckedChangeListener { _, checkedId ->
 
             val radioButton = gravityRadioGroup.findViewById(checkedId) as RadioButton

@@ -53,6 +53,7 @@ class WaveformSeekBar : View {
         waveBackgroundColor = ta.getColor(R.styleable.WaveformSeekBar_wave_background_color,waveBackgroundColor)
         waveProgressColor = ta.getColor(R.styleable.WaveformSeekBar_wave_progress_color,waveProgressColor)
         progress = ta.getInteger(R.styleable.WaveformSeekBar_wave_progress,progress)
+        maxProgress = ta.getFloat(R.styleable.WaveformSeekBar_wave_max_progress,maxProgress)
         val gravity = ta.getString(R.styleable.WaveformSeekBar_wave_gravity)
         waveGravity = when(gravity){
             "1" -> WaveGravity.TOP
@@ -96,7 +97,7 @@ class WaveformSeekBar : View {
             mWaveRect.set(lastWaveRight, top, lastWaveRight+waveWidth, top + waveHeight)
 
             when {
-                mWaveRect.contains(getAvailableWith()*progress/100F, mWaveRect.centerY()) -> {
+                mWaveRect.contains(getAvailableWith()*progress/maxProgress, mWaveRect.centerY()) -> {
                     var bitHeight = mWaveRect.height().toInt()
                     if (bitHeight <= 0)
                         bitHeight = waveWidth.toInt()
@@ -104,7 +105,7 @@ class WaveformSeekBar : View {
                     val bitmap = Bitmap.createBitmap(getAvailableWith(),bitHeight , Bitmap.Config.ARGB_8888)
                     mProgressCanvas.setBitmap(bitmap)
 
-                    val fillWidth = (getAvailableWith()*progress/100F)
+                    val fillWidth = (getAvailableWith()*progress/maxProgress)
 
                     mWavePaint.color = waveProgressColor
                     mProgressCanvas.drawRect(0F,0F,fillWidth,mWaveRect.bottom,mWavePaint)
@@ -115,7 +116,7 @@ class WaveformSeekBar : View {
                     val shader = BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
                     mWavePaint.shader = shader
                 }
-                mWaveRect.right <= getAvailableWith()*progress/100F -> {
+                mWaveRect.right <= getAvailableWith()*progress/maxProgress -> {
                     mWavePaint.color = waveProgressColor
                     mWavePaint.shader = null
                 }
@@ -182,7 +183,7 @@ class WaveformSeekBar : View {
 
     private fun updateProgress(event: MotionEvent?){
 
-        progress = (100*event!!.x/getAvailableWith()).toInt()
+        progress = (maxProgress*event!!.x/getAvailableWith()).toInt()
         invalidate()
 
         if (onProgressChanged != null)
@@ -212,6 +213,12 @@ class WaveformSeekBar : View {
 
             if (onProgressChanged != null)
                 onProgressChanged!!.onProgressChanged(this,progress,false)
+        }
+
+    var maxProgress : Float = 100F
+        set(value) {
+            field = value
+            invalidate()
         }
 
     var waveBackgroundColor : Int = Color.LTGRAY

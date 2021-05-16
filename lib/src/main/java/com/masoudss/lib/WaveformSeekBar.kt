@@ -7,6 +7,8 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
+import androidx.annotation.Keep
+import androidx.annotation.RestrictTo
 import com.masoudss.lib.exception.SampleDataException
 import com.masoudss.lib.utils.ThreadBlocking
 import com.masoudss.lib.utils.Utils
@@ -58,7 +60,6 @@ class WaveformSeekBar : View {
         }
 
         ta.recycle()
-        WaveformOptions.init(context)
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -69,7 +70,6 @@ class WaveformSeekBar : View {
 
     @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas) {
-
         super.onDraw(canvas)
         if (sample == null || sample!!.isEmpty())
             throw SampleDataException()
@@ -256,11 +256,18 @@ class WaveformSeekBar : View {
         }
 
     @ThreadBlocking
-    fun setSampleFrom(audio: File) = setSampleFrom(audio.path)
+    fun setSampleFrom(samples: IntArray) {
+        this.sample = samples
+    }
+
+    @ThreadBlocking
+    fun setSampleFrom(audio: File) {
+        setSampleFrom(audio.path)
+    }
 
     @ThreadBlocking
     fun setSampleFrom(path: String) {
-        WaveformOptions.getSampleFrom(path) {
+        WaveformOptions.getSampleFrom(context, path) {
             sample = it
         }
     }

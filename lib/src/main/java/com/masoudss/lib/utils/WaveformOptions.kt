@@ -1,33 +1,19 @@
 package com.masoudss.lib.utils
 
 import android.content.Context
-import linc.com.amplituda.Amplituda
 import java.io.File
+import java.lang.reflect.Constructor
 
 internal object WaveformOptions {
 
-    private var amplituda: Amplituda? = null
-
     @JvmStatic
-    fun init(context: Context) {
-        if(amplituda == null) {
-            amplituda = Amplituda(context)
-        }
+    fun getSampleFrom(context: Context, file: File, onSuccess:(samples: IntArray) -> Unit) {
+        getSampleFrom(context, file.path, onSuccess)
     }
 
     @JvmStatic
-    fun getSampleFrom(file: File, onSuccess:(samples: IntArray) -> Unit) {
-        amplituda!!.fromFile(file)
-            .amplitudesAsList {
-                onSuccess(it.toIntArray())
-            }
-    }
-
-    @JvmStatic
-    fun getSampleFrom(path: String, onSuccess: (IntArray) -> Unit) {
-        amplituda!!.fromPath(path)
-            .amplitudesAsList {
-                onSuccess(it.toIntArray())
-            }
+    fun getSampleFrom(context: Context, path: String, onSuccess: (IntArray) -> Unit) {
+//        ExternalAmplituda.run(onSuccess, context, "/storage/emulated/0/Music/kygo.mp3")
+        ExternalAmplituda.run(onSuccess, context, path)
     }
 }

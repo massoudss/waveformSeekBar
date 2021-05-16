@@ -26,6 +26,9 @@ Add the dependency to your app build.gradle file
 ```
 dependencies {
     implementation  'com.github.massoudss:waveformSeekBar:2.1.0'
+
+    // Add Amplituda dependency when you need to use setSampleFrom(AUDIO|PATH)
+    implementation 'com.github.lincollincol:Amplituda:1.7' // or newer version
 }
 ```
 
@@ -62,8 +65,6 @@ waveformSeekBar.waveCornerRadius = Utils.dp(this,2)
 waveformSeekBar.waveGravity = WaveGravity.CENTER
 waveformSeekBar.waveBackgroundColor = ContextCompat.getColor(this,R.color.colorAccent)
 waveformSeekBar.waveProgressColor = ContextCompat.getColor(this,R.color.colorPrimary)
-waveformSeekBar.sample = sample data Int array
-waveformSeekBar.setSampleFrom(AUDIO_FILE || AUDIO_PATH)
 ```
 
 ### Java
@@ -77,9 +78,17 @@ waveformSeekBar.setWaveCornerRadius(Utils.dp(this,2));
 waveformSeekBar.setWaveGravity(WaveGravity.CENTER);
 waveformSeekBar.setWaveBackgroundColor(ContextCompat.getColor(this,R.color.white));
 waveformSeekBar.setWaveProgressColor(ContextCompat.getColor(this,R.color.blue));
-waveformSeekBar.setSample(sample data Int array);
-waveformSeekBar.setSampleFrom(AUDIO_FILE || AUDIO_PATH);
 ```
+### Set samples
+Method setSampleFrom() has few overloadings. 
+* You can use your own sample data when call ```setSampleFrom``` with ```IntArray``` parameter.
+* In another case you can call ```setSampleFrom``` with ```File``` or ```String``` (audio path) parameter and WaveformSeekbar will process your audio. This overloading requeire ```Amplituda``` dependency
+``` java
+waveformSeekBar.setSampleFrom(samples: IntArray) // or Java array => new int[] { /* samples */ }
+waveformSeekBar.setSampleFrom(audio: File)
+waveformSeekBar.setSampleFrom(path: String)
+```
+
 
 ### Warning 
 waveformSeekBar.setSampleFrom(audio) can block your main(ui) thread! Please run this function in the background thread.
@@ -110,7 +119,7 @@ You can customize WaveformSeekBar, all of this attributes can change via xml or 
 |wave_progress_color|Color|`waveProgressColor`|Reached Waves color, default color is `Color.WHITE`|
 | - |IntArray|`sample`|Sample data for drawing waves, default is `null`|
 
-# Reduce size
+## Reduce size
 Add ``` android:extractNativeLibs="false" ``` to application in the Manifest.xml
 
 ``` xml
@@ -122,7 +131,7 @@ Add ``` android:extractNativeLibs="false" ``` to application in the Manifest.xml
 </application>
 ```
 
-# License
+## License
 ```
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

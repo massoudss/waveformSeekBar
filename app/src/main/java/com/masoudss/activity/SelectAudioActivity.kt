@@ -51,11 +51,11 @@ class SelectAudioActivity : AppCompatActivity() {
                     MediaStore.Audio.Media.DATE_ADDED + " DESC")
 
                 while (cursor!!.moveToNext()) {
-                    val audioModel = AudioModel()
-                    audioModel.artist = cursor.getString(1)
-                    audioModel.title = cursor.getString(2)
-                    audioModel.path = cursor.getString(3)
-                    audioList.add(audioModel)
+                    audioList.add(AudioModel(
+                        title = cursor.getString(1),
+                        artist = cursor.getString(2),
+                        path = cursor.getString(3)
+                    ))
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

@@ -7,8 +7,6 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
-import androidx.annotation.Keep
-import androidx.annotation.RestrictTo
 import com.masoudss.lib.exception.AmplitudaNotFoundException
 import com.masoudss.lib.exception.SampleDataException
 import com.masoudss.lib.utils.ThreadBlocking

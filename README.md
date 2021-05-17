@@ -6,7 +6,7 @@ Android Waveform SeekBar library
 This library works with api level 21 and higher
 
 <img src="./files/preview.png" width="300">
-<img src="./files/preview.gif" width="300">
+<img src="./files/preview.webm" width="300">
 
 
 ## How to add

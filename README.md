@@ -3,8 +3,6 @@
 # WaveformSeekBar
 Android Waveform SeekBar library
 
-This library works with api level 21 and higher
-
 <img src="./files/preview.png" width="300">
 <img src="./files/preview.gif" width="300">
 
@@ -28,6 +26,7 @@ dependencies {
     implementation  'com.github.massoudss:waveformSeekBar:2.4.0'
 
     // Add Amplituda dependency when you need to use setSampleFrom(AUDIO|PATH)
+    // Important: Only works with api level 21 and higher
     implementation 'com.github.lincollincol:Amplituda:1.7' // or newer version
 }
 ```

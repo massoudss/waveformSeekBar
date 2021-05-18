@@ -23,7 +23,7 @@ Add the dependency to your app build.gradle file
 
 ```
 dependencies {
-    implementation  'com.github.massoudss:waveformSeekBar:2.4.0'
+    implementation  'com.github.massoudss:waveformSeekBar:2.4.1'
 
     // Add Amplituda dependency when you need to use setSampleFrom(AUDIO|PATH)
     // Important: Only works with api level 21 and higher

@@ -72,7 +72,6 @@ class WaveformSeekBar : View {
         if (sample?.isEmpty() != false)
             return
 
-        mMaxValue = sample?.max() ?:0
         val step = (getAvailableWith() / (waveGap + waveWidth)) / sample!!.size
 
         var i = 0F
@@ -190,6 +189,7 @@ class WaveformSeekBar : View {
     var sample: IntArray? = null
         set(value) {
             field = value
+            setMaxValue()
             invalidate()
         }
 
@@ -247,6 +247,10 @@ class WaveformSeekBar : View {
             field = value
             invalidate()
         }
+
+    private fun setMaxValue() {
+        mMaxValue = sample?.max() ?:0
+    }
 
     @ThreadBlocking
     fun setSampleFrom(samples: IntArray) {

@@ -158,7 +158,6 @@ class WaveformSeekBar : View {
 
     private fun updateProgress(event: MotionEvent) {
         progress = maxProgress * event.x / getAvailableWith()
-        invalidate()
         onProgressChanged?.onProgressChanged(this, progress, true)
     }
 

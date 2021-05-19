@@ -1,6 +1,5 @@
 package com.masoudss.lib
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
@@ -26,6 +25,8 @@ class WaveformSeekBar : View {
     private var mMaxValue = Utils.dp(context, 2).toInt()
     private var mTouchDownX = 0F
     private var mScaledTouchSlop = ViewConfiguration.get(context).scaledTouchSlop
+    private lateinit var progressBitmap: Bitmap
+    private lateinit var progressShader: Shader
 
     constructor(context: Context?) : super(context) {
         init(null)
@@ -64,22 +65,21 @@ class WaveformSeekBar : View {
         super.onSizeChanged(w, h, oldw, oldh)
         mCanvasWidth = w
         mCanvasHeight = h
+        progressBitmap = Bitmap.createBitmap(getAvailableWith(), mCanvasHeight, Bitmap.Config.ARGB_8888)
+        progressShader = BitmapShader(progressBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
     }
 
-    @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         if (sample?.isEmpty() != false)
             return
 
         val step = (getAvailableWith() / (waveGap + waveWidth)) / sample!!.size
-
-        var i = 0F
         var lastWaveRight = paddingLeft.toFloat()
-        while (i < sample!!.size) {
 
-            var waveHeight = getAvailableHeight() * (sample!![i.toInt()].toFloat() / mMaxValue)
-
+        var sampleItemPosition = 0F
+        while (sampleItemPosition < sample!!.size) {
+            var waveHeight = getAvailableHeight() * (sample!![sampleItemPosition.toInt()].toFloat() / mMaxValue)
             if (waveHeight < waveMinHeight)
                 waveHeight = waveMinHeight
 
@@ -90,26 +90,15 @@ class WaveformSeekBar : View {
             }
 
             mWaveRect.set(lastWaveRight, top, lastWaveRight + waveWidth, top + waveHeight)
-
             when {
                 mWaveRect.contains(getAvailableWith() * progress / maxProgress, mWaveRect.centerY()) -> {
-                    var bitHeight = mWaveRect.height().toInt()
-                    if (bitHeight <= 0)
-                        bitHeight = waveWidth.toInt()
-
-                    val bitmap = Bitmap.createBitmap(getAvailableWith(), bitHeight, Bitmap.Config.ARGB_8888)
-                    mProgressCanvas.setBitmap(bitmap)
-
+                    mProgressCanvas.setBitmap(progressBitmap)
                     val fillWidth = (getAvailableWith() * progress / maxProgress)
-
                     mWavePaint.color = waveProgressColor
                     mProgressCanvas.drawRect(0F, 0F, fillWidth, mWaveRect.bottom, mWavePaint)
-
                     mWavePaint.color = waveBackgroundColor
                     mProgressCanvas.drawRect(fillWidth, 0F, getAvailableWith().toFloat(), mWaveRect.bottom, mWavePaint)
-
-                    val shader = BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
-                    mWavePaint.shader = shader
+                    mWavePaint.shader = progressShader
                 }
                 mWaveRect.right <= getAvailableWith() * progress / maxProgress -> {
                     mWavePaint.color = waveProgressColor
@@ -120,15 +109,11 @@ class WaveformSeekBar : View {
                     mWavePaint.shader = null
                 }
             }
-
             canvas.drawRoundRect(mWaveRect, waveCornerRadius, waveCornerRadius, mWavePaint)
-
             lastWaveRight = mWaveRect.right + waveGap
-
             if (lastWaveRight + waveWidth > getAvailableWith() + paddingLeft)
                 break
-
-            i += 1 / step
+            sampleItemPosition += 1 / step
         }
     }
 

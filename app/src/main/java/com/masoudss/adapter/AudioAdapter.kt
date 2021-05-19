@@ -9,11 +9,11 @@ import com.masoudss.activity.SelectAudioActivity
 import com.masoudss.model.AudioModel
 import kotlinx.android.synthetic.main.item_audio.view.*
 
-class AudioAdapter(private val activity: SelectAudioActivity,private val audioList : ArrayList<AudioModel>) :
-    RecyclerView.Adapter<AudioAdapter.AudioViewHolder>() {
+class AudioAdapter(private val activity: SelectAudioActivity, private val audioList: ArrayList<AudioModel>) :
+        RecyclerView.Adapter<AudioAdapter.AudioViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AudioViewHolder {
-        return AudioViewHolder(LayoutInflater.from(activity).inflate(R.layout.item_audio,parent,false))
+        return AudioViewHolder(LayoutInflater.from(activity).inflate(R.layout.item_audio, parent, false))
     }
 
     override fun getItemCount(): Int {

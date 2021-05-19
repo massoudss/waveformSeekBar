@@ -23,7 +23,7 @@ Add the dependency to your app build.gradle file
 
 ```
 dependencies {
-    implementation  'com.github.massoudss:waveformSeekBar:2.4.1'
+    implementation  'com.github.massoudss:waveformSeekBar:3.0.0'
 
     // Add Amplituda dependency when you need to use setSampleFrom(AUDIO|PATH)
     // Important: Only works with api level 21 and higher
@@ -111,7 +111,8 @@ You can customize WaveformSeekBar, all of this attributes can change via xml or 
 
 |Attribute|Type|Kotlin|Description|
 |:---:|:---:|:---:|:---:|
-|wave_progress|Integer|`progress`|SeekBar progress value, default value is `0`|
+|wave_progress|Float|`progress`|SeekBar progress value, default value is `0F`|
+|wave_max_progress|Float|`maxProgress`|SeekBar max progress value, default value is `100F`|
 |wave_width|Dimension|`waveWidth`|Width of each wave, default value is `5dp`|
 |wave_gap|Dimension|`waveGap`|Gap width between waves, default value is `2dp`|
 |wave_min_height|Dimension|`waveMinHeight`|Minimum height of each wave, default value is equal to `waveWidth`|

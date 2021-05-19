@@ -18,7 +18,6 @@ class WaveformSeekBar : View {
 
     private var mCanvasWidth = 0
     private var mCanvasHeight = 0
-
     private val mWavePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val mWaveRect = RectF()
     private val mProgressCanvas = Canvas()
@@ -71,49 +70,51 @@ class WaveformSeekBar : View {
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        if (sample?.isEmpty() != false)
-            return
+        sample?.let { waveSample ->
+            if (waveSample.isEmpty())
+                return
 
-        val step = (getAvailableWith() / (waveGap + waveWidth)) / sample!!.size
-        var lastWaveRight = paddingLeft.toFloat()
+            val step = (getAvailableWith() / (waveGap + waveWidth)) / waveSample.size
+            var lastWaveRight = paddingLeft.toFloat()
 
-        var sampleItemPosition = 0F
-        while (sampleItemPosition < sample!!.size) {
-            var waveHeight = getAvailableHeight() * (sample!![sampleItemPosition.toInt()].toFloat() / mMaxValue)
-            if (waveHeight < waveMinHeight)
-                waveHeight = waveMinHeight
+            var sampleItemPosition = 0F
+            while (sampleItemPosition < waveSample.size) {
+                var waveHeight = getAvailableHeight() * (waveSample[sampleItemPosition.toInt()].toFloat() / mMaxValue)
+                if (waveHeight < waveMinHeight)
+                    waveHeight = waveMinHeight
 
-            val top: Float = when (waveGravity) {
-                WaveGravity.TOP -> paddingTop.toFloat()
-                WaveGravity.CENTER -> paddingTop + getAvailableHeight() / 2F - waveHeight / 2F
-                WaveGravity.BOTTOM -> mCanvasHeight - paddingBottom - waveHeight
+                val top: Float = when (waveGravity) {
+                    WaveGravity.TOP -> paddingTop.toFloat()
+                    WaveGravity.CENTER -> paddingTop + getAvailableHeight() / 2F - waveHeight / 2F
+                    WaveGravity.BOTTOM -> mCanvasHeight - paddingBottom - waveHeight
+                }
+
+                mWaveRect.set(lastWaveRight, top, lastWaveRight + waveWidth, top + waveHeight)
+                when {
+                    mWaveRect.contains(getAvailableWith() * progress / maxProgress, mWaveRect.centerY()) -> {
+                        mProgressCanvas.setBitmap(progressBitmap)
+                        val fillWidth = (getAvailableWith() * progress / maxProgress)
+                        mWavePaint.color = waveProgressColor
+                        mProgressCanvas.drawRect(0F, 0F, fillWidth, mWaveRect.bottom, mWavePaint)
+                        mWavePaint.color = waveBackgroundColor
+                        mProgressCanvas.drawRect(fillWidth, 0F, getAvailableWith().toFloat(), mWaveRect.bottom, mWavePaint)
+                        mWavePaint.shader = progressShader
+                    }
+                    mWaveRect.right <= getAvailableWith() * progress / maxProgress -> {
+                        mWavePaint.color = waveProgressColor
+                        mWavePaint.shader = null
+                    }
+                    else -> {
+                        mWavePaint.color = waveBackgroundColor
+                        mWavePaint.shader = null
+                    }
+                }
+                canvas.drawRoundRect(mWaveRect, waveCornerRadius, waveCornerRadius, mWavePaint)
+                lastWaveRight = mWaveRect.right + waveGap
+                if (lastWaveRight + waveWidth > getAvailableWith() + paddingLeft)
+                    break
+                sampleItemPosition += 1 / step
             }
-
-            mWaveRect.set(lastWaveRight, top, lastWaveRight + waveWidth, top + waveHeight)
-            when {
-                mWaveRect.contains(getAvailableWith() * progress / maxProgress, mWaveRect.centerY()) -> {
-                    mProgressCanvas.setBitmap(progressBitmap)
-                    val fillWidth = (getAvailableWith() * progress / maxProgress)
-                    mWavePaint.color = waveProgressColor
-                    mProgressCanvas.drawRect(0F, 0F, fillWidth, mWaveRect.bottom, mWavePaint)
-                    mWavePaint.color = waveBackgroundColor
-                    mProgressCanvas.drawRect(fillWidth, 0F, getAvailableWith().toFloat(), mWaveRect.bottom, mWavePaint)
-                    mWavePaint.shader = progressShader
-                }
-                mWaveRect.right <= getAvailableWith() * progress / maxProgress -> {
-                    mWavePaint.color = waveProgressColor
-                    mWavePaint.shader = null
-                }
-                else -> {
-                    mWavePaint.color = waveBackgroundColor
-                    mWavePaint.shader = null
-                }
-            }
-            canvas.drawRoundRect(mWaveRect, waveCornerRadius, waveCornerRadius, mWavePaint)
-            lastWaveRight = mWaveRect.right + waveGap
-            if (lastWaveRight + waveWidth > getAvailableWith() + paddingLeft)
-                break
-            sampleItemPosition += 1 / step
         }
     }
 

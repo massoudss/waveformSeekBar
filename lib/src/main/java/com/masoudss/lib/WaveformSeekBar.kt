@@ -8,7 +8,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
 import com.masoudss.lib.exception.AmplitudaNotFoundException
-import com.masoudss.lib.exception.SampleDataException
 import com.masoudss.lib.utils.ThreadBlocking
 import com.masoudss.lib.utils.Utils
 import com.masoudss.lib.utils.WaveGravity
@@ -70,10 +69,10 @@ class WaveformSeekBar : View {
     @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        if (sample == null || sample!!.isEmpty())
-            throw SampleDataException()
+        if (sample?.isEmpty() != false)
+            return
 
-        mMaxValue = sample!!.max()!!
+        mMaxValue = sample?.max() ?:0
         val step = (getAvailableWith() / (waveGap + waveWidth)) / sample!!.size
 
         var i = 0F

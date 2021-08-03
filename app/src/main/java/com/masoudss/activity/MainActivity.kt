@@ -215,7 +215,7 @@ class MainActivity : AppCompatActivity() {
     private fun getDummyWaveSample(): IntArray {
         val data = IntArray(50)
         for (i in data.indices)
-            data[i] = Random().nextInt(data.size)
+            data[i] = 0
 
         return data
     }

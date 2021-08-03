@@ -80,7 +80,7 @@ class WaveformSeekBar : View {
             var sampleItemPosition = 0F
             while (sampleItemPosition < waveSample.size) {
                 var waveHeight = getAvailableHeight() * (waveSample[sampleItemPosition.toInt()].toFloat() / mMaxValue)
-                if (waveHeight < waveMinHeight)
+                if (waveHeight.isNaN() || waveHeight < waveMinHeight)
                     waveHeight = waveMinHeight
 
                 val top: Float = when (waveGravity) {

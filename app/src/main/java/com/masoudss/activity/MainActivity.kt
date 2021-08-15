@@ -10,19 +10,17 @@ import android.os.Build
 import android.os.Bundle
 import android.widget.RadioButton
 import android.widget.SeekBar
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.masoudss.R
 import com.masoudss.lib.*
+import com.masoudss.lib.utils.Utils
+import com.masoudss.lib.utils.WaveGravity
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import java.util.*
-import android.widget.Toast
-import com.masoudss.R
-import com.masoudss.lib.utils.Utils
-import com.masoudss.lib.utils.WaveGravity
-//import linc.com.amplituda.Amplituda
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -34,7 +32,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         waveformSeekBar.apply {
-            progress = 33
+            progress = 33.2F
             waveWidth = Utils.dp(this@MainActivity, 5)
             waveGap = Utils.dp(this@MainActivity, 2)
             waveMinHeight = Utils.dp(this@MainActivity, 5)
@@ -44,16 +42,16 @@ class MainActivity : AppCompatActivity() {
             waveProgressColor = ContextCompat.getColor(this@MainActivity, R.color.blue)
             sample = getDummyWaveSample()
             onProgressChanged = object : SeekBarOnProgressChanged {
-                override fun onProgressChanged(waveformSeekBar: WaveformSeekBar, progress: Int, fromUser: Boolean) {
+                override fun onProgressChanged(waveformSeekBar: WaveformSeekBar, progress: Float, fromUser: Boolean) {
                     if (fromUser)
-                        waveProgress.progress = progress
+                        waveProgress.progress = progress.toInt()
                 }
             }
         }
 
-        waveWidth.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+        waveWidth.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                waveformSeekBar.waveWidth = progress/100F* Utils.dp(this@MainActivity,20)
+                waveformSeekBar.waveWidth = progress / 100F * Utils.dp(this@MainActivity, 20)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -61,9 +59,9 @@ class MainActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        waveCornerRadius.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+        waveCornerRadius.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                waveformSeekBar.waveCornerRadius = progress/100F* Utils.dp(this@MainActivity,10)
+                waveformSeekBar.waveCornerRadius = progress / 100F * Utils.dp(this@MainActivity, 10)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -71,9 +69,9 @@ class MainActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        waveGap.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+        waveGap.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                waveformSeekBar.waveGap = progress/100F* Utils.dp(this@MainActivity,10)
+                waveformSeekBar.waveGap = progress / 100F * Utils.dp(this@MainActivity, 10)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -81,9 +79,20 @@ class MainActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        waveProgress.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+        waveProgress.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                waveformSeekBar.progress = progress
+                waveformSeekBar.progress = progress.toFloat()
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+
+        waveMaxProgress.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                waveProgress.max = progress
+                waveformSeekBar.maxProgress = progress.toFloat()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -95,7 +104,7 @@ class MainActivity : AppCompatActivity() {
 
             val radioButton = gravityRadioGroup.findViewById(checkedId) as RadioButton
             val index = gravityRadioGroup.indexOfChild(radioButton)
-            waveformSeekBar.waveGravity = when (index){
+            waveformSeekBar.waveGravity = when (index) {
                 0 -> WaveGravity.TOP
                 1 -> WaveGravity.CENTER
                 else -> WaveGravity.BOTTOM
@@ -106,7 +115,7 @@ class MainActivity : AppCompatActivity() {
 
             val radioButton = waveColorRadioGroup.findViewById(checkedId) as RadioButton
             val index = waveColorRadioGroup.indexOfChild(radioButton)
-            waveformSeekBar.waveBackgroundColor = when (index){
+            waveformSeekBar.waveBackgroundColor = when (index) {
                 0 -> ContextCompat.getColor(this, R.color.pink)
                 1 -> ContextCompat.getColor(this, R.color.yellow)
                 else -> ContextCompat.getColor(this, R.color.white)
@@ -117,7 +126,7 @@ class MainActivity : AppCompatActivity() {
 
             val radioButton = progressColorRadioGroup.findViewById(checkedId) as RadioButton
             val index = progressColorRadioGroup.indexOfChild(radioButton)
-            waveformSeekBar.waveProgressColor = when (index){
+            waveformSeekBar.waveProgressColor = when (index) {
                 0 -> ContextCompat.getColor(this, R.color.red)
                 1 -> ContextCompat.getColor(this, R.color.blue)
                 else -> ContextCompat.getColor(this, R.color.green)
@@ -138,7 +147,7 @@ class MainActivity : AppCompatActivity() {
 
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (data!= null && requestCode == REQ_CODE_PICK_SOUND_FILE && resultCode == Activity.RESULT_OK) {
+        if (data != null && requestCode == REQ_CODE_PICK_SOUND_FILE && resultCode == Activity.RESULT_OK) {
             val path = data.getStringExtra("path")
 
             val progressDialog = ProgressDialog(this@MainActivity)
@@ -174,7 +183,7 @@ class MainActivity : AppCompatActivity() {
             else
                 launchSelectAudioActivity()
 
-        }else
+        } else
             launchSelectAudioActivity()
     }
 
@@ -182,13 +191,13 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == REQ_CODE_STORAGE_PERMMISION) {
             var denied = false
             for (i in permissions.indices)
-                if (grantResults[i] == PackageManager.PERMISSION_DENIED){
+                if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
                     denied = true
                     break
                 }
 
             if (denied)
-                Toast.makeText(this@MainActivity,getString(R.string.permission_error),Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, getString(R.string.permission_error), Toast.LENGTH_SHORT).show()
             else
                 launchSelectAudioActivity()
 
@@ -198,14 +207,14 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun launchSelectAudioActivity(){
-        val intent = Intent(this@MainActivity,SelectAudioActivity::class.java)
-        startActivityForResult(intent,REQ_CODE_PICK_SOUND_FILE)
+    private fun launchSelectAudioActivity() {
+        val intent = Intent(this@MainActivity, SelectAudioActivity::class.java)
+        startActivityForResult(intent, REQ_CODE_PICK_SOUND_FILE)
     }
 
     private fun getDummyWaveSample(): IntArray {
         val data = IntArray(50)
-        for (i in 0 until data.size)
+        for (i in data.indices)
             data[i] = Random().nextInt(data.size)
 
         return data

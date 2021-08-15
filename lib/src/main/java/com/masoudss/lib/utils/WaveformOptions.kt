@@ -18,4 +18,5 @@ internal object WaveformOptions {
     fun getSampleFrom(context: Context, path: String, onSuccess: (IntArray) -> Unit) {
         ExternalAmplituda.run(onSuccess, context, path)
     }
+
 }

@@ -6,6 +6,7 @@ import java.lang.ClassCastException
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Proxy
 
+@Deprecated
 internal object ExternalAmplituda {
 
     private const val CONTEXT = 0

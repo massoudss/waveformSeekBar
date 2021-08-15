@@ -6,7 +6,6 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
-import com.masoudss.lib.exception.AmplitudaNotFoundException
 import com.masoudss.lib.utils.ThreadBlocking
 import com.masoudss.lib.utils.Utils
 import com.masoudss.lib.utils.WaveGravity
@@ -234,7 +233,7 @@ class WaveformSeekBar : View {
         }
 
     private fun setMaxValue() {
-        mMaxValue = sample?.max() ?:0
+        mMaxValue = sample?.max() ?: 0
     }
 
     @ThreadBlocking
@@ -243,15 +242,20 @@ class WaveformSeekBar : View {
     }
 
     @ThreadBlocking
-    @Throws(AmplitudaNotFoundException::class)
     fun setSampleFrom(audio: File) {
         setSampleFrom(audio.path)
     }
 
     @ThreadBlocking
-    @Throws(AmplitudaNotFoundException::class)
-    fun setSampleFrom(path: String) {
-        WaveformOptions.getSampleFrom(context, path) {
+    fun setSampleFrom(audio: String) {
+        WaveformOptions.getSampleFrom(context, audio) {
+            sample = it
+        }
+    }
+
+    @ThreadBlocking
+    fun setSampleFrom(audio: Int) {
+        WaveformOptions.getSampleFrom(context, audio) {
             sample = it
         }
     }

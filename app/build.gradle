@@ -34,4 +34,6 @@ dependencies {
     implementation "org.jetbrains.anko:anko-commons:0.10.0"
 
     implementation project(':lib')
+    implementation 'com.github.lincollincol:amplituda:2.1.0'
+
 }

@@ -1,20 +1,30 @@
 package com.masoudss.lib.utils
 
 import android.content.Context
-import com.masoudss.lib.exception.AmplitudaNotFoundException
-import java.io.File
+import linc.com.amplituda.Amplituda
+import linc.com.amplituda.AmplitudaProcessingOutput
+import linc.com.amplituda.exceptions.AmplitudaException
 
 internal object WaveformOptions {
 
     @JvmStatic
-    @Throws(AmplitudaNotFoundException::class)
-    fun getSampleFrom(context: Context, file: File, onSuccess: (samples: IntArray) -> Unit) {
-        getSampleFrom(context, file.path, onSuccess)
+    fun getSampleFrom(context: Context, pathOrUrl: String, onSuccess: (IntArray) -> Unit) {
+        handleAmplitudaOutput(Amplituda(context).processAudio(pathOrUrl), onSuccess)
     }
 
     @JvmStatic
-    @Throws(AmplitudaNotFoundException::class)
-    fun getSampleFrom(context: Context, path: String, onSuccess: (IntArray) -> Unit) {
-        ExternalAmplituda.run(onSuccess, context, path)
+    fun getSampleFrom(context: Context, resource: Int, onSuccess: (IntArray) -> Unit) {
+        handleAmplitudaOutput(Amplituda(context).processAudio(resource), onSuccess)
     }
+
+    private fun handleAmplitudaOutput(
+        amplitudaOutput: AmplitudaProcessingOutput<*>,
+        onSuccess: (IntArray) -> Unit
+    ) {
+        val result = amplitudaOutput.get { exception: AmplitudaException ->
+            exception.printStackTrace()
+        }
+        onSuccess(result.amplitudesAsList().toTypedArray().toIntArray())
+    }
+
 }

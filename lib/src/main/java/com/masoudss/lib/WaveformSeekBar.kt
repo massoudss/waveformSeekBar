@@ -161,10 +161,6 @@ class WaveformSeekBar : View {
                     }
                 }
                 MotionEvent.ACTION_UP -> {
-                    if (abs(event.x - mTouchDownX) > mScaledTouchSlop || mAlreadyMoved) {
-                        updateProgress(event)
-                        mAlreadyMoved = true
-                    }
                     performClick()
                 }
             }

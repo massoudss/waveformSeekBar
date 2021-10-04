@@ -159,6 +159,22 @@
                 android:layout_width="300dp"
                 android:layout_height="wrap_content" />
 
+            <TextView
+                android:layout_marginTop="16dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Shown duration"
+                android:layout_gravity="center" />
+
+            <SeekBar
+                android:min="0"
+                android:max="200"
+                android:progress="0"
+                android:id="@+id/visibleProgress"
+                android:layout_gravity="center"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content" />
+
             <LinearLayout
                 android:layout_marginTop="16dp"
                 android:layout_width="match_parent"

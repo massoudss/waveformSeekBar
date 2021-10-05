@@ -55,6 +55,7 @@ class WaveformSeekBar : View {
         waveProgressColor = ta.getColor(R.styleable.WaveformSeekBar_wave_progress_color, waveProgressColor)
         progress = ta.getFloat(R.styleable.WaveformSeekBar_wave_progress, progress)
         maxProgress = ta.getFloat(R.styleable.WaveformSeekBar_wave_max_progress, maxProgress)
+        visibleProgress = ta.getFloat(R.styleable.WaveformSeekBar_wave_visible_progress, visibleProgress)
         val gravity = ta.getString(R.styleable.WaveformSeekBar_wave_gravity)
         waveGravity = when (gravity) {
             "1" -> WaveGravity.TOP
@@ -105,7 +106,7 @@ class WaveformSeekBar : View {
                 start = 0
                 progressView = getAvailableWidth() * progress / maxProgress
             }
-            for (i in start until barsToDraw + start + 1) {
+            for (i in start until barsToDraw + start + 3) {
                 sampleItemPosition = floor(i * step).roundToInt()
                 var waveHeight = if (sampleItemPosition >= 0 && sampleItemPosition < waveSample.size)
                     getAvailableHeight() * (waveSample[sampleItemPosition].toFloat() / mMaxValue)

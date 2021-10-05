@@ -79,12 +79,13 @@ class WaveformSeekBar : View {
                 return
 
             canvas.clipRect(paddingLeft, paddingTop, mCanvasWidth - paddingRight, mCanvasHeight - paddingBottom)
-            var step = waveSample.size / (getAvailableWidth() / (waveGap + waveWidth))
+            val totalWaveWidth = waveGap + waveWidth
+            var step = waveSample.size / (getAvailableWidth() / totalWaveWidth)
 
             var lastWaveRight = paddingLeft.toFloat()
             var sampleItemPosition: Int
 
-            val barsToDraw = (getAvailableWidth() / (waveGap + waveWidth)).toInt()
+            val barsToDraw = (getAvailableWidth() / totalWaveWidth).toInt()
             val start: Int
             val progressView: Float
             if (visibleProgress > 0) {
@@ -94,10 +95,10 @@ class WaveformSeekBar : View {
                 // intFactor is required as depending on whether an equal number of bars must be drawn, the start will switch differently
                 val intFactor = (((barsForProgress + 1) % 2))
                 // Calculate fixed start change depending
-                lastWaveRight += (getAvailableWidth() * 0.5F) % waveWidth
-                lastWaveRight += intFactor * 0.5F * waveWidth - waveWidth
+                lastWaveRight += (getAvailableWidth() * 0.5F) % totalWaveWidth
+                lastWaveRight += intFactor * 0.5F * totalWaveWidth - totalWaveWidth
                 // Calculate start change depending on progress, so that it moves smoothly
-                lastWaveRight -= ((progress + intFactor * visibleProgress / barsForProgress * 0.5f) % (visibleProgress / barsForProgress)) / (visibleProgress / barsForProgress) * waveWidth
+                lastWaveRight -= ((progress + intFactor * visibleProgress / barsForProgress * 0.5f) % (visibleProgress / barsForProgress)) / (visibleProgress / barsForProgress) * totalWaveWidth
                 start = (progress * barsForProgress / visibleProgress - (barsForProgress / 2F)).roundToInt() - 1
                 progressView = getAvailableWidth() * 0.5F
             } else {

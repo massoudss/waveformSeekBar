@@ -15,8 +15,9 @@ import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
-
-class WaveformSeekBar : View {
+class WaveformSeekBar @JvmOverloads constructor(
+    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+) : View(context, attrs, defStyleAttr) {
 
     private var mCanvasWidth = 0
     private var mCanvasHeight = 0
@@ -31,22 +32,78 @@ class WaveformSeekBar : View {
     private lateinit var progressBitmap: Bitmap
     private lateinit var progressShader: Shader
 
-    constructor(context: Context?) : super(context) {
-        init(null)
-    }
+    var onProgressChanged: SeekBarOnProgressChanged? = null
 
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
-        init(attrs)
-    }
+    var sample: IntArray? = null
+        set(value) {
+            field = value
+            setMaxValue()
+            invalidate()
+        }
 
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        init(attrs)
-    }
+    var progress: Float = 0F
+        set(value) {
+            field = value
+            invalidate()
+            onProgressChanged?.onProgressChanged(this, progress, false)
+        }
 
-    private fun init(attrs: AttributeSet?) {
+    var maxProgress: Float = 100F
+        set(value) {
+            field = value
+            invalidate()
+        }
 
+    var waveBackgroundColor: Int = Color.LTGRAY
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    var waveProgressColor: Int = Color.WHITE
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    var waveGap: Float = Utils.dp(context, 2)
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    var waveWidth: Float = Utils.dp(context, 5)
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    var waveMinHeight: Float = waveWidth
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    var waveCornerRadius: Float = Utils.dp(context, 2)
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    var waveGravity: WaveGravity = WaveGravity.CENTER
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    var visibleProgress: Float = 0F
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    init  {
         val ta = context.obtainStyledAttributes(attrs, R.styleable.WaveformSeekBar)
-
         waveWidth = ta.getDimension(R.styleable.WaveformSeekBar_wave_width, waveWidth)
         waveGap = ta.getDimension(R.styleable.WaveformSeekBar_wave_gap, waveGap)
         waveCornerRadius = ta.getDimension(R.styleable.WaveformSeekBar_wave_corner_radius, waveCornerRadius)
@@ -56,13 +113,37 @@ class WaveformSeekBar : View {
         progress = ta.getFloat(R.styleable.WaveformSeekBar_wave_progress, progress)
         maxProgress = ta.getFloat(R.styleable.WaveformSeekBar_wave_max_progress, maxProgress)
         visibleProgress = ta.getFloat(R.styleable.WaveformSeekBar_wave_visible_progress, visibleProgress)
-        val gravity = ta.getString(R.styleable.WaveformSeekBar_wave_gravity)
-        waveGravity = when (gravity) {
-            "1" -> WaveGravity.TOP
-            "2" -> WaveGravity.CENTER
-            else -> WaveGravity.BOTTOM
-        }
+        val gravity = ta.getString(R.styleable.WaveformSeekBar_wave_gravity)?.toInt() ?: WaveGravity.CENTER.ordinal
+        waveGravity = WaveGravity.values()[gravity]
         ta.recycle()
+    }
+
+    private fun setMaxValue() {
+        mMaxValue = sample?.max() ?: 0
+    }
+
+    @ThreadBlocking
+    fun setSampleFrom(samples: IntArray) {
+        this.sample = samples
+    }
+
+    @ThreadBlocking
+    fun setSampleFrom(audio: File) {
+        setSampleFrom(audio.path)
+    }
+
+    @ThreadBlocking
+    fun setSampleFrom(audio: String) {
+        WaveformOptions.getSampleFrom(context, audio) {
+            sample = it
+        }
+    }
+
+    @ThreadBlocking
+    fun setSampleFrom(audio: Int) {
+        WaveformOptions.getSampleFrom(context, audio) {
+            sample = it
+        }
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -219,103 +300,7 @@ class WaveformSeekBar : View {
     }
 
     private fun getAvailableWidth() = mCanvasWidth - paddingLeft - paddingRight
+
     private fun getAvailableHeight() = mCanvasHeight - paddingTop - paddingBottom
 
-    var onProgressChanged: SeekBarOnProgressChanged? = null
-
-    var sample: IntArray? = null
-        set(value) {
-            field = value
-            setMaxValue()
-            invalidate()
-        }
-
-    var progress: Float = 0F
-        set(value) {
-            field = value
-            invalidate()
-            onProgressChanged?.onProgressChanged(this, progress, false)
-        }
-
-    var maxProgress: Float = 100F
-        set(value) {
-            field = value
-            invalidate()
-        }
-
-    var waveBackgroundColor: Int = Color.LTGRAY
-        set(value) {
-            field = value
-            invalidate()
-        }
-
-    var waveProgressColor: Int = Color.WHITE
-        set(value) {
-            field = value
-            invalidate()
-        }
-
-    var waveGap: Float = Utils.dp(context, 2)
-        set(value) {
-            field = value
-            invalidate()
-        }
-
-    var waveWidth: Float = Utils.dp(context, 5)
-        set(value) {
-            field = value
-            invalidate()
-        }
-
-    var waveMinHeight: Float = waveWidth
-        set(value) {
-            field = value
-            invalidate()
-        }
-
-    var waveCornerRadius: Float = Utils.dp(context, 2)
-        set(value) {
-            field = value
-            invalidate()
-        }
-
-    var waveGravity: WaveGravity = WaveGravity.CENTER
-        set(value) {
-            field = value
-            invalidate()
-        }
-
-    var visibleProgress: Float = 0F
-        set(value) {
-            field = value
-            invalidate()
-        }
-
-    private fun setMaxValue() {
-        mMaxValue = sample?.max() ?: 0
-    }
-
-    @ThreadBlocking
-    fun setSampleFrom(samples: IntArray) {
-        this.sample = samples
-    }
-
-    @ThreadBlocking
-    fun setSampleFrom(audio: File) {
-        setSampleFrom(audio.path)
-    }
-
-    @ThreadBlocking
-    fun setSampleFrom(audio: String) {
-        WaveformOptions.getSampleFrom(context, audio) {
-            sample = it
-        }
-    }
-
-    @ThreadBlocking
-    fun setSampleFrom(audio: Int) {
-        WaveformOptions.getSampleFrom(context, audio) {
-            sample = it
-        }
-    }
 }

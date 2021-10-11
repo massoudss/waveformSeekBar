@@ -119,6 +119,7 @@ You can customize WaveformSeekBar, all of this attributes can change via xml or 
 |:---:|:---:|:---:|:---:|
 |wave_progress|Float|`progress`|SeekBar progress value, default value is `0F`|
 |wave_max_progress|Float|`maxProgress`|SeekBar max progress value, default value is `100F`|
+|wave_visible_progress|Float|`visibleProgress`|How much part of the progress should be shown, default value is `0F` meaning everything is shown and progress indicator moves, if value > `0F` the bars move and progress indicator stays in the center|
 |wave_width|Dimension|`waveWidth`|Width of each wave, default value is `5dp`|
 |wave_gap|Dimension|`waveGap`|Gap width between waves, default value is `2dp`|
 |wave_min_height|Dimension|`waveMinHeight`|Minimum height of each wave, default value is equal to `waveWidth`|

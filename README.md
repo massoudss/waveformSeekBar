@@ -23,7 +23,7 @@ Add the dependency to your app build.gradle file
 
 ``` groovy
 dependencies {
-    implementation  'com.github.massoudss:waveformSeekBar:4.0.0'
+    implementation  'com.github.massoudss:waveformSeekBar:4.0.1'
 
     // Amplitude will allow you to call setSampleFrom() with files, URLs and resources
     // Important: Only works with api level 21 and higher

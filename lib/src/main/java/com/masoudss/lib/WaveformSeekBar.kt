@@ -122,7 +122,7 @@ open class WaveformSeekBar @JvmOverloads constructor(
             invalidate()
         }
 
-    init  {
+    init {
         val ta = context.obtainStyledAttributes(attrs, R.styleable.WaveformSeekBar)
         waveWidth = ta.getDimension(R.styleable.WaveformSeekBar_wave_width, waveWidth)
         waveGap = ta.getDimension(R.styleable.WaveformSeekBar_wave_gap, waveGap)

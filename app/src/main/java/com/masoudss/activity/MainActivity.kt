@@ -42,6 +42,7 @@ class MainActivity : AppCompatActivity() {
             waveBackgroundColor = ContextCompat.getColor(this@MainActivity, R.color.white)
             waveProgressColor = ContextCompat.getColor(this@MainActivity, R.color.blue)
             sample = getDummyWaveSample()
+            marker = getDummyMarkerSample()
             onProgressChanged = object : SeekBarOnProgressChanged {
                 override fun onProgressChanged(waveformSeekBar: WaveformSeekBar, progress: Float, fromUser: Boolean) {
                     if (fromUser)
@@ -231,5 +232,11 @@ class MainActivity : AppCompatActivity() {
         return data
     }
 
+    private fun getDummyMarkerSample(): HashMap<Float, String>? {
+        val map = hashMapOf<Float,String>();
+        map[waveformSeekBar.maxProgress/2] = "Middle"
+        map[waveformSeekBar.maxProgress/4] = "Quarter"
+        return map
+    }
 
 }

@@ -191,7 +191,7 @@ open class WaveformSeekBar @JvmOverloads constructor(
 
             val barsToDraw = (getAvailableWidth() / totalWaveWidth).toInt()
             val start: Int
-            val progressView: Float
+            val progressXPosition: Float
             if (visibleProgress > 0) {
                 // If visibleProgress is > 0, the bars move instead of the blue colored part
                 step *= visibleProgress / maxProgress
@@ -204,10 +204,10 @@ open class WaveformSeekBar @JvmOverloads constructor(
                 // Calculate start change depending on progress, so that it moves smoothly
                 previousWaveRight -= ((progress + intFactor * visibleProgress / barsForProgress * 0.5f) % (visibleProgress / barsForProgress)) / (visibleProgress / barsForProgress) * totalWaveWidth
                 start = (progress * barsForProgress / visibleProgress - (barsForProgress / 2F)).roundToInt() - 1
-                progressView = getAvailableWidth() * 0.5F
+                progressXPosition = getAvailableWidth() * 0.5F
             } else {
                 start = 0
-                progressView = getAvailableWidth() * progress / maxProgress
+                progressXPosition = getAvailableWidth() * progress / maxProgress
             }
 
             // draw waves
@@ -228,15 +228,15 @@ open class WaveformSeekBar @JvmOverloads constructor(
                 mWaveRect.set(previousWaveRight, top, previousWaveRight + waveWidth, top + waveHeight)
                 when {
                     // if progress is currently in waveRect, color have to be split up
-                    mWaveRect.contains(progressView, mWaveRect.centerY()) -> {
+                    mWaveRect.contains(progressXPosition, mWaveRect.centerY()) -> {
                         mProgressCanvas.setBitmap(progressBitmap)
                         mWavePaint.color = waveProgressColor
-                        mProgressCanvas.drawRect(0F, 0F, progressView, mWaveRect.bottom, mWavePaint)
+                        mProgressCanvas.drawRect(0F, 0F, progressXPosition, mWaveRect.bottom, mWavePaint)
                         mWavePaint.color = waveBackgroundColor
-                        mProgressCanvas.drawRect(progressView, 0F, getAvailableWidth().toFloat(), mWaveRect.bottom, mWavePaint)
+                        mProgressCanvas.drawRect(progressXPosition, 0F, getAvailableWidth().toFloat(), mWaveRect.bottom, mWavePaint)
                         mWavePaint.shader = progressShader
                     }
-                    mWaveRect.right <= progressView -> {
+                    mWaveRect.right <= progressXPosition -> {
                         mWavePaint.color = waveProgressColor
                         mWavePaint.shader = null
                     }

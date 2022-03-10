@@ -287,13 +287,15 @@ open class WaveformSeekBar @JvmOverloads constructor(
     }
 
     private fun updateProgress(event: MotionEvent) {
-        if (visibleProgress > 0) {
-            progress = mProgress - visibleProgress * (event.x - mTouchDownX) / getAvailableWidth()
-            progress = (progress).coerceIn(0F, maxProgress)
+        onProgressChanged?.onProgressChanged(this, getProgress(event), true)
+    }
+
+    private fun getProgress(event: MotionEvent): Float {
+        return if (visibleProgress > 0) {
+            (mProgress - visibleProgress * (event.x - mTouchDownX) / getAvailableWidth()).coerceIn(0F, maxProgress)
         } else {
-            progress = maxProgress * event.x / getAvailableWidth()
+            maxProgress * event.x / getAvailableWidth()
         }
-        onProgressChanged?.onProgressChanged(this, progress, true)
     }
 
     override fun performClick(): Boolean {

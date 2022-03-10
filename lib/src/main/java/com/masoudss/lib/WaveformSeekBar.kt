@@ -164,7 +164,7 @@ open class WaveformSeekBar @JvmOverloads constructor(
             val totalWaveWidth = waveGap + waveWidth
             var step = waveSample.size / (getAvailableWidth() / totalWaveWidth)
 
-            var lastWaveRight = paddingLeft.toFloat()
+            var previousWaveRight = paddingLeft.toFloat()
             var sampleItemPosition: Int
 
             val barsToDraw = (getAvailableWidth() / totalWaveWidth).toInt()
@@ -177,10 +177,10 @@ open class WaveformSeekBar @JvmOverloads constructor(
                 // intFactor is required as depending on whether an equal number of bars must be drawn, the start will switch differently
                 val intFactor = (((barsForProgress + 1) % 2))
                 // Calculate fixed start change depending
-                lastWaveRight += (getAvailableWidth() * 0.5F) % totalWaveWidth
-                lastWaveRight += intFactor * 0.5F * totalWaveWidth - totalWaveWidth
+                previousWaveRight += (getAvailableWidth() * 0.5F) % totalWaveWidth
+                previousWaveRight += intFactor * 0.5F * totalWaveWidth - totalWaveWidth
                 // Calculate start change depending on progress, so that it moves smoothly
-                lastWaveRight -= ((progress + intFactor * visibleProgress / barsForProgress * 0.5f) % (visibleProgress / barsForProgress)) / (visibleProgress / barsForProgress) * totalWaveWidth
+                previousWaveRight -= ((progress + intFactor * visibleProgress / barsForProgress * 0.5f) % (visibleProgress / barsForProgress)) / (visibleProgress / barsForProgress) * totalWaveWidth
                 start = (progress * barsForProgress / visibleProgress - (barsForProgress / 2F)).roundToInt() - 1
                 progressView = getAvailableWidth() * 0.5F
             } else {
@@ -202,7 +202,7 @@ open class WaveformSeekBar @JvmOverloads constructor(
                     WaveGravity.BOTTOM -> mCanvasHeight - paddingBottom - waveHeight
                 }
 
-                mWaveRect.set(lastWaveRight, top, lastWaveRight + waveWidth, top + waveHeight)
+                mWaveRect.set(previousWaveRight, top, previousWaveRight + waveWidth, top + waveHeight)
                 when {
                     mWaveRect.contains(progressView, mWaveRect.centerY()) -> {
                         mProgressCanvas.setBitmap(progressBitmap)
@@ -222,7 +222,7 @@ open class WaveformSeekBar @JvmOverloads constructor(
                     }
                 }
                 canvas.drawRoundRect(mWaveRect, waveCornerRadius, waveCornerRadius, mWavePaint)
-                lastWaveRight = mWaveRect.right + waveGap
+                previousWaveRight = mWaveRect.right + waveGap
             }
         }
     }

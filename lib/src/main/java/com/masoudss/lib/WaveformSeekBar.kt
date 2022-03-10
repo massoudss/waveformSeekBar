@@ -23,6 +23,8 @@ open class WaveformSeekBar @JvmOverloads constructor(
     private var mCanvasHeight = 0
     private val mWavePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val mWaveRect = RectF()
+    private val mMarkerPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val mMarkerRect = RectF()
     private val mProgressCanvas = Canvas()
     private var mMaxValue = Utils.dp(context, 2).toInt()
     private var mTouchDownX = 0F
@@ -96,6 +98,24 @@ open class WaveformSeekBar @JvmOverloads constructor(
             invalidate()
         }
 
+    var marker: HashMap<Float, String>? = null
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    var markerWidth: Float = Utils.dp(context, 1)
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    var markerColor: Int = Color.MAGENTA
+        set(value) {
+            field = value
+            invalidate()
+        }
+
     var visibleProgress: Float = 0F
         set(value) {
             field = value
@@ -115,6 +135,8 @@ open class WaveformSeekBar @JvmOverloads constructor(
         visibleProgress = ta.getFloat(R.styleable.WaveformSeekBar_wave_visible_progress, visibleProgress)
         val gravity = ta.getString(R.styleable.WaveformSeekBar_wave_gravity)?.toInt() ?: WaveGravity.CENTER.ordinal
         waveGravity = WaveGravity.values()[gravity]
+        markerWidth = ta.getDimension(R.styleable.WaveformSeekBar_marker_width, markerWidth)
+        markerColor = ta.getColor(R.styleable.WaveformSeekBar_marker_color, markerColor)
         ta.recycle()
     }
 
@@ -225,6 +247,31 @@ open class WaveformSeekBar @JvmOverloads constructor(
                 }
                 canvas.drawRoundRect(mWaveRect, waveCornerRadius, waveCornerRadius, mWavePaint)
                 previousWaveRight = mWaveRect.right + waveGap
+            }
+
+            //draw markers
+            marker?.forEach {
+                // ToDo implement for visibleProgress > 0
+                if (visibleProgress > 0) {
+                    return;
+                }
+
+                // out of progress range
+                if (it.key < 0 || it.key > maxProgress) return;
+
+                val markerXPosition = (it.key / waveSample.size) * width
+                mMarkerRect.set(markerXPosition - (markerWidth / 2), 0f, markerXPosition + (markerWidth / 2), getAvailableHeight().toFloat())
+                mMarkerPaint.color = markerColor
+                // ToDo variable font size as attribute
+                mMarkerPaint.textSize = 25f
+                canvas.drawRect(mMarkerRect, mMarkerPaint)
+
+                val markerTextDistance = 10f;
+                val markerTextXPosition = -markerXPosition - (markerWidth / 2) - markerTextDistance
+
+                canvas.rotate(90f)
+                canvas.drawText(it.value, 0f, markerTextXPosition, mMarkerPaint)
+                canvas.rotate(-90f)
             }
         }
     }

@@ -187,14 +187,15 @@ open class WaveformSeekBar @JvmOverloads constructor(
                 start = 0
                 progressView = getAvailableWidth() * progress / maxProgress
             }
+
+            // draw waves
             for (i in start until barsToDraw + start + 3) {
                 sampleItemPosition = floor(i * step).roundToInt()
                 var waveHeight = if (sampleItemPosition >= 0 && sampleItemPosition < waveSample.size)
                     getAvailableHeight() * (waveSample[sampleItemPosition].toFloat() / mMaxValue)
                 else 0F
 
-                if (waveHeight < waveMinHeight)
-                    waveHeight = waveMinHeight
+                if (waveHeight < waveMinHeight) waveHeight = waveMinHeight
 
                 val top: Float = when (waveGravity) {
                     WaveGravity.TOP -> paddingTop.toFloat()
@@ -204,6 +205,7 @@ open class WaveformSeekBar @JvmOverloads constructor(
 
                 mWaveRect.set(previousWaveRight, top, previousWaveRight + waveWidth, top + waveHeight)
                 when {
+                    // if progress is currently in waveRect, color have to be split up
                     mWaveRect.contains(progressView, mWaveRect.centerY()) -> {
                         mProgressCanvas.setBitmap(progressBitmap)
                         mWavePaint.color = waveProgressColor

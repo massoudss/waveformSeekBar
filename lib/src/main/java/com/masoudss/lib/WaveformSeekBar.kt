@@ -334,7 +334,8 @@ open class WaveformSeekBar @JvmOverloads constructor(
     }
 
     private fun updateProgress(event: MotionEvent) {
-        onProgressChanged?.onProgressChanged(this, getProgress(event), true)
+        progress = getProgress(event);
+        onProgressChanged?.onProgressChanged(this, progress, true)
     }
 
     private fun getProgress(event: MotionEvent): Float {

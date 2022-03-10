@@ -259,7 +259,7 @@ open class WaveformSeekBar @JvmOverloads constructor(
                 // out of progress range
                 if (it.key < 0 || it.key > maxProgress) return;
 
-                val markerXPosition = (it.key / waveSample.size) * width
+                val markerXPosition = getAvailableWidth() * (it.key / maxProgress)
                 mMarkerRect.set(markerXPosition - (markerWidth / 2), 0f, markerXPosition + (markerWidth / 2), getAvailableHeight().toFloat())
                 mMarkerPaint.color = markerColor
                 // ToDo variable font size as attribute

@@ -270,7 +270,7 @@ open class WaveformSeekBar @JvmOverloads constructor(
                 val markerTextXPosition = -markerXPosition - (markerWidth / 2) - markerTextDistance
 
                 canvas.rotate(90f)
-                canvas.drawText(it.value, 0f, markerTextXPosition, mMarkerPaint)
+                canvas.drawText(it.value, markerTextDistance, markerTextXPosition, mMarkerPaint)
                 canvas.rotate(-90f)
             }
         }

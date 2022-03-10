@@ -110,7 +110,7 @@ open class WaveformSeekBar @JvmOverloads constructor(
             invalidate()
         }
 
-    var markerColor: Int = Color.MAGENTA
+    var markerColor: Int = Color.GREEN
         set(value) {
             field = value
             invalidate()

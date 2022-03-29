@@ -6,10 +6,9 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
-import com.masoudss.lib.utils.ThreadBlocking
-import com.masoudss.lib.utils.Utils
-import com.masoudss.lib.utils.WaveGravity
+import com.masoudss.lib.utils.*
 import com.masoudss.lib.utils.WaveformOptions
+import kotlinx.coroutines.*
 import java.io.File
 import kotlin.math.abs
 import kotlin.math.floor
@@ -18,6 +17,8 @@ import kotlin.math.roundToInt
 open class WaveformSeekBar @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
+
+    private var coroutineScope = CoroutineScope(Dispatchers.IO)
 
     private var mCanvasWidth = 0
     private var mCanvasHeight = 0
@@ -32,13 +33,15 @@ open class WaveformSeekBar @JvmOverloads constructor(
     private lateinit var progressBitmap: Bitmap
     private lateinit var progressShader: Shader
 
-    var onProgressChanged: SeekBarOnProgressChanged? = null
+    private var onProgressChanged: SeekBarOnProgressChanged? = null
 
-    var sample: IntArray? = null
+    private var sample: IntArray? = null
         set(value) {
             field = value
-            setMaxValue()
-            invalidate()
+            runOnUiThread {
+                setMaxValue()
+                invalidate()
+            }
         }
 
     var progress: Float = 0F
@@ -102,7 +105,7 @@ open class WaveformSeekBar @JvmOverloads constructor(
             invalidate()
         }
 
-    init  {
+    init {
         val ta = context.obtainStyledAttributes(attrs, R.styleable.WaveformSeekBar)
         waveWidth = ta.getDimension(R.styleable.WaveformSeekBar_wave_width, waveWidth)
         waveGap = ta.getDimension(R.styleable.WaveformSeekBar_wave_gap, waveGap)
@@ -119,30 +122,46 @@ open class WaveformSeekBar @JvmOverloads constructor(
     }
 
     private fun setMaxValue() {
-        mMaxValue = sample?.max() ?: 0
+        mMaxValue = sample?.maxOrNull() ?: 0
     }
 
-    @ThreadBlocking
+    fun setOnProgressChangedListener(onProgressChanged: SeekBarOnProgressChanged) {
+        this.onProgressChanged = onProgressChanged
+    }
+
     fun setSampleFrom(samples: IntArray) {
         this.sample = samples
     }
 
-    @ThreadBlocking
-    fun setSampleFrom(audio: File) {
-        setSampleFrom(audio.path)
-    }
-
-    @ThreadBlocking
-    fun setSampleFrom(audio: String) {
-        WaveformOptions.getSampleFrom(context, audio) {
-            sample = it
+    fun setSampleFromAsync(audio: File) {
+        coroutineScope.launch {
+            setSampleFrom(audio)
         }
     }
 
-    @ThreadBlocking
-    fun setSampleFrom(audio: Int) {
-        WaveformOptions.getSampleFrom(context, audio) {
-            sample = it
+    fun setSampleFromAsync(audio: String) {
+        coroutineScope.launch {
+            setSampleFrom(audio)
+        }
+    }
+
+    private suspend fun setSampleFrom(audio: File) {
+        setSampleFrom(audio.path)
+    }
+
+    private suspend fun setSampleFrom(audio: String) {
+        withContext(Dispatchers.IO) {
+            WaveformOptions.getSampleFrom(context, audio) {
+                sample = it
+            }
+        }
+    }
+
+    suspend fun setSampleFrom(audio: Int) {
+        withContext(Dispatchers.IO) {
+            WaveformOptions.getSampleFrom(context, audio) {
+                sample = it
+            }
         }
     }
 
@@ -209,7 +228,13 @@ open class WaveformSeekBar @JvmOverloads constructor(
                         mWavePaint.color = waveProgressColor
                         mProgressCanvas.drawRect(0F, 0F, progressView, mWaveRect.bottom, mWavePaint)
                         mWavePaint.color = waveBackgroundColor
-                        mProgressCanvas.drawRect(progressView, 0F, getAvailableWidth().toFloat(), mWaveRect.bottom, mWavePaint)
+                        mProgressCanvas.drawRect(
+                            progressView,
+                            0F,
+                            getAvailableWidth().toFloat(),
+                            mWaveRect.bottom,
+                            mWavePaint
+                        )
                         mWavePaint.shader = progressShader
                     }
                     mWaveRect.right <= progressView -> {

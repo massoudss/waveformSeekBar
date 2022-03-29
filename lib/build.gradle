@@ -1,35 +1,33 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-android'
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+}
 
 android {
-    compileSdkVersion 30
-    ndkVersion "21.1.6352462"
+    compileSdkVersion versions.compileSdkVersion
+    buildToolsVersion versions.buildTools
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 30
+        minSdkVersion versions.minSdkVersion
+        targetSdkVersion versions.targetSdkVersion
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
-
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    // Coroutines
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.coroutines}"
+
     implementation "androidx.appcompat:appcompat:1.2.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     compileOnly 'com.github.lincollincol:amplituda:2.1.0'
 }
+
 repositories {
     mavenCentral()
 }

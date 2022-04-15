@@ -150,7 +150,7 @@ open class WaveformSeekBar @JvmOverloads constructor(
         super.onSizeChanged(w, h, oldw, oldh)
         mCanvasWidth = w
         mCanvasHeight = h
-        progressBitmap = Bitmap.createBitmap(getAvailableWidth(), mCanvasHeight, Bitmap.Config.ARGB_8888)
+        progressBitmap = Bitmap.createBitmap(getAvailableWidth(), getAvailableHeight(), Bitmap.Config.ARGB_8888)
         progressShader = BitmapShader(progressBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
     }
 
@@ -299,8 +299,16 @@ open class WaveformSeekBar @JvmOverloads constructor(
         return true
     }
 
-    private fun getAvailableWidth() = mCanvasWidth - paddingLeft - paddingRight
+    private fun getAvailableWidth(): Int {
+        var width = mCanvasWidth - paddingLeft - paddingRight
+        if (width <= 0) width = 1
+        return width
+    }
 
-    private fun getAvailableHeight() = mCanvasHeight - paddingTop - paddingBottom
+    private fun getAvailableHeight(): Int {
+        var height = mCanvasHeight - paddingTop - paddingBottom
+        if (height <= 0) height = 1
+        return height
+    }
 
 }

@@ -3,7 +3,8 @@
 # WaveformSeekBar
 Android Waveform SeekBar library
 
-<img src="./files/preview.png" width="300">
+<img src="./files/preview.png" width="500">
+<img src="https://user-images.githubusercontent.com/36920541/159234717-af36d8d9-4407-49ed-83f1-d32900917753.png" width ="500">
 <img src="./files/preview.gif" width="300">
 
 
@@ -46,12 +47,20 @@ just add ``WaveformSeekBar`` in your java/kotlin code or xml.
     app:wave_gap="2dp"
     app:wave_min_height="5dp"
     app:wave_corner_radius="2dp"
-    app:wave_background_color="@color/colorAccent"
-    app:wave_progress_color="@color/colorPrimary"
+    app:wave_background_color="@color/white"
+    app:wave_progress_color="@color/blue"
     app:wave_gravity="center"
-    android:id="@+id/waveformSeekBar"
-    android:layout_width="300dp"
-    android:layout_height="50dp"/>
+    app:wave_padding_top="2dp"
+    app:wave_padding_Bottom="2dp"
+    app:wave_padding_right="2dp"
+    app:wave_padding_left="2dp"
+    // setting wave_visible_progress will disable markers                            
+    app:wave_visible_progress="50"
+    app:marker_color="@color/red"
+    app:marker_width="1dp"
+    app:marker_text_color="@color/colorAccent"
+    app:marker_text_padding="2dp"
+    app:marker_text_size="12dp" />
 ```
 
 ### Set samples
@@ -88,16 +97,25 @@ waveformSeekBar.onProgressChanged = object : SeekBarOnProgressChanged {
 ### Customization
 #### Kotlin
 ``` kotlin
-val waveformSeekBar = WaveformSeekBar(yourContext)
-waveformSeekBar.progress = 33
-waveformSeekBar.maxProgress = 100
-waveformSeekBar.waveWidth = Utils.dp(this,5)
-waveformSeekBar.waveGap = Utils.dp(this,2)
-waveformSeekBar.waveMinHeight = Utils.dp(this,5)
-waveformSeekBar.waveCornerRadius = Utils.dp(this,2)
-waveformSeekBar.waveGravity = WaveGravity.CENTER
-waveformSeekBar.waveBackgroundColor = ContextCompat.getColor(this,R.color.colorAccent)
-waveformSeekBar.waveProgressColor = ContextCompat.getColor(this,R.color.colorPrimary)
+waveformSeekBar.apply {
+    progress = 33.2F
+    waveWidth = 5F
+    waveGap = 2F
+    waveMinHeight = 5F
+    waveCornerRadius = 2F
+    waveGravity = WaveGravity.CENTER
+    wavePaddingTop = 2
+    wavePaddingBottom = 2
+    wavePaddingRight = 2
+    wavePaddingLeft = 2
+    waveBackgroundColor = Color.WHITE
+    waveProgressColor = Color.BLUE
+    markerTextColor = Color.MAGENTA
+    markerTextPadding = 1F
+    markerTextSize = 12F
+    markerWidth = 1F
+    markerColor = Color.RED
+}
 ```
 
 ### View Properties

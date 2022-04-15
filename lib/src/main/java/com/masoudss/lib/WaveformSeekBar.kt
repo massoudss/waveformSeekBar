@@ -2,10 +2,12 @@ package com.masoudss.lib
 
 import android.content.Context
 import android.graphics.*
+import android.net.Uri
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
+import androidx.annotation.RawRes
 import com.masoudss.lib.utils.ThreadBlocking
 import com.masoudss.lib.utils.Utils
 import com.masoudss.lib.utils.WaveGravity
@@ -211,7 +213,13 @@ open class WaveformSeekBar @JvmOverloads constructor(
     }
 
     @ThreadBlocking
-    fun setSampleFrom(audio: Int) {
+    fun setSampleFrom(@RawRes audio: Int) {
+        WaveformOptions.getSampleFrom(context, audio) {
+            sample = it
+        }
+    }
+    @ThreadBlocking
+    fun setSampleFrom(audio: Uri) {
         WaveformOptions.getSampleFrom(context, audio) {
             sample = it
         }

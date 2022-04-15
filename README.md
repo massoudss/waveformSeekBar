@@ -3,7 +3,8 @@
 # WaveformSeekBar
 Android Waveform SeekBar library
 
-<img src="./files/preview.png" width="300">
+<img src="./files/preview.png" width="500">
+<img src="https://user-images.githubusercontent.com/36920541/159234717-af36d8d9-4407-49ed-83f1-d32900917753.png" width ="500">
 <img src="./files/preview.gif" width="300">
 
 
@@ -23,9 +24,9 @@ Add the dependency to your app build.gradle file
 
 ``` groovy
 dependencies {
-    implementation  'com.github.massoudss:waveformSeekBar:4.1.0'
+    implementation  'com.github.massoudss:waveformSeekBar:5.0.0'
 
-    // Amplitude will allow you to call setSampleFrom() with files, URLs and resources
+    // Amplitude will allow you to call setSampleFrom() with files, URLs, Uri and resources
     // Important: Only works with api level 21 and higher
     implementation 'com.github.lincollincol:amplituda:2.1.0' // or newer version
 }
@@ -46,12 +47,20 @@ just add ``WaveformSeekBar`` in your java/kotlin code or xml.
     app:wave_gap="2dp"
     app:wave_min_height="5dp"
     app:wave_corner_radius="2dp"
-    app:wave_background_color="@color/colorAccent"
-    app:wave_progress_color="@color/colorPrimary"
+    app:wave_background_color="@color/white"
+    app:wave_progress_color="@color/blue"
     app:wave_gravity="center"
-    android:id="@+id/waveformSeekBar"
-    android:layout_width="300dp"
-    android:layout_height="50dp"/>
+    app:wave_padding_top="2dp"
+    app:wave_padding_Bottom="2dp"
+    app:wave_padding_right="2dp"
+    app:wave_padding_left="2dp"
+    // setting wave_visible_progress will disable markers                            
+    app:wave_visible_progress="50"
+    app:marker_color="@color/red"
+    app:marker_width="1dp"
+    app:marker_text_color="@color/colorAccent"
+    app:marker_text_padding="2dp"
+    app:marker_text_size="12dp" />
 ```
 
 ### Set samples
@@ -69,6 +78,9 @@ waveformSeekBar.setSampleFrom("/storage/emulated/0/Music/song.mp3")
 // Url
 waveformSeekBar.setSampleFrom("https://audio-url-example.com/song.mp3")
 
+// Uri
+waveformSeekBar.setSampleFrom("URI")
+
 // Resource (res/raw)
 waveformSeekBar.setSampleFrom(R.raw.song)
 ```
@@ -85,30 +97,25 @@ waveformSeekBar.onProgressChanged = object : SeekBarOnProgressChanged {
 ### Customization
 #### Kotlin
 ``` kotlin
-val waveformSeekBar = WaveformSeekBar(yourContext)
-waveformSeekBar.progress = 33
-waveformSeekBar.maxProgress = 100
-waveformSeekBar.waveWidth = Utils.dp(this,5)
-waveformSeekBar.waveGap = Utils.dp(this,2)
-waveformSeekBar.waveMinHeight = Utils.dp(this,5)
-waveformSeekBar.waveCornerRadius = Utils.dp(this,2)
-waveformSeekBar.waveGravity = WaveGravity.CENTER
-waveformSeekBar.waveBackgroundColor = ContextCompat.getColor(this,R.color.colorAccent)
-waveformSeekBar.waveProgressColor = ContextCompat.getColor(this,R.color.colorPrimary)
-```
-
-#### Java
-``` java
-WaveformSeekBar waveformSeekBar = new WaveformSeekBar(yourContext);
-waveformSeekBar.setProgress(33);
-waveformSeekBar.setMaxProgress(100);
-waveformSeekBar.setWaveWidth(Utils.dp(this,5));
-waveformSeekBar.setWaveGap(Utils.dp(this,2));
-waveformSeekBar.setWaveMinHeight(Utils.dp(this,5));
-waveformSeekBar.setWaveCornerRadius(Utils.dp(this,2));
-waveformSeekBar.setWaveGravity(WaveGravity.CENTER);
-waveformSeekBar.setWaveBackgroundColor(ContextCompat.getColor(this,R.color.white));
-waveformSeekBar.setWaveProgressColor(ContextCompat.getColor(this,R.color.blue));
+waveformSeekBar.apply {
+    progress = 33.2F
+    waveWidth = 5F
+    waveGap = 2F
+    waveMinHeight = 5F
+    waveCornerRadius = 2F
+    waveGravity = WaveGravity.CENTER
+    wavePaddingTop = 2
+    wavePaddingBottom = 2
+    wavePaddingRight = 2
+    wavePaddingLeft = 2
+    waveBackgroundColor = Color.WHITE
+    waveProgressColor = Color.BLUE
+    markerTextColor = Color.MAGENTA
+    markerTextPadding = 1F
+    markerTextSize = 12F
+    markerWidth = 1F
+    markerColor = Color.RED
+}
 ```
 
 ### View Properties
@@ -122,11 +129,20 @@ You can customize WaveformSeekBar, all of this attributes can change via xml or 
 |wave_visible_progress|Float|`visibleProgress`|How much part of the progress should be shown, default value is `0F` meaning everything is shown and progress indicator moves, if value > `0F` the bars move and progress indicator stays in the center|
 |wave_width|Dimension|`waveWidth`|Width of each wave, default value is `5dp`|
 |wave_gap|Dimension|`waveGap`|Gap width between waves, default value is `2dp`|
+|wave_padding_top|Dimension|`wavePaddingTop`|Waves padding width from top, default value is `0`|
+|wave_padding_bottom|Dimension|`wavePaddingBottom`|Waves padding width from bottom, default value is `0`|
+|wave_padding_right|Dimension|`wavePaddingRight`|Waves padding width from right, default value is `0`|
+|wave_padding_left|Dimension|`wavePaddingLeft`|Waves padding width from left, default value is `0`|
 |wave_min_height|Dimension|`waveMinHeight`|Minimum height of each wave, default value is equal to `waveWidth`|
 |wave_corner_radius|Dimension|`waveCornerRadius`|Corner raduis of each wave, default value is `2dp`|
 |wave_gravity|Enum|`waveGravity`|Waves Gravity, default is `WaveGravity.CENTER`|
 |wave_background_color|Color|`waveBackgroundColor`|UnReached Waves color, default color is `Color.LTGRAY`|
 |wave_progress_color|Color|`waveProgressColor`|Reached Waves color, default color is `Color.WHITE`|
+|marker_width|Dimension|`markerWidth`|Marker vertical line with, default value is `1dp`|
+|marker_color|Color|`markerColor`|Marker vertical line color, default value is `Color.GREEN`|
+|marker_text_size|Dimension|`markerTextSize`|Marker text size, default value is `12dp`|
+|marker_text_color|Color|`markerTextColor`|Marker text color, default color is `Color.RED` |
+|marker_text_padding|Dimension|`markerTextPadding`|Marker text padding, default value is `0`|
 | - |IntArray|`sample`|Sample data for drawing waves, default is `null`|
 
 ### Reduce size

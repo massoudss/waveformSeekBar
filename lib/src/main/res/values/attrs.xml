@@ -16,6 +16,8 @@
             <enum name="center" value="1" />
             <enum name="bottom" value="2" />
         </attr>
+        <attr name="marker_width" format="dimension" />
+        <attr name="marker_color" format="color" />
     </declare-styleable>
 
 </resources>

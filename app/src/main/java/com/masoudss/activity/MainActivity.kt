@@ -232,8 +232,8 @@ class MainActivity : AppCompatActivity() {
         return data
     }
 
-    private fun getDummyMarkerSample(): HashMap<Float, String>? {
-        val map = hashMapOf<Float,String>();
+    private fun getDummyMarkerSample(): HashMap<Float, String> {
+        val map = hashMapOf<Float,String>()
         map[waveformSeekBar.maxProgress/2] = "Middle"
         map[waveformSeekBar.maxProgress/4] = "Quarter"
         return map

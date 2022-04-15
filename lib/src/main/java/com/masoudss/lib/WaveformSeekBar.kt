@@ -74,6 +74,30 @@ open class WaveformSeekBar @JvmOverloads constructor(
             invalidate()
         }
 
+    var wavePaddingTop: Int = 0
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    var wavePaddingBottom: Int = 0
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    var wavePaddingLeft: Int = 0
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    var wavePaddingRight: Int = 0
+        set(value) {
+            field = value
+            invalidate()
+        }
+
     var waveWidth: Float = Utils.dp(context, 5)
         set(value) {
             field = value
@@ -116,6 +140,24 @@ open class WaveformSeekBar @JvmOverloads constructor(
             invalidate()
         }
 
+    var markerTextColor: Int = Color.RED
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    var markerTextSize: Float = Utils.dp(context, 12)
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    var markerTextPadding: Float = Utils.dp(context, 2)
+        set(value) {
+            field = value
+            invalidate()
+        }
+
     var visibleProgress: Float = 0F
         set(value) {
             field = value
@@ -126,6 +168,10 @@ open class WaveformSeekBar @JvmOverloads constructor(
         val ta = context.obtainStyledAttributes(attrs, R.styleable.WaveformSeekBar)
         waveWidth = ta.getDimension(R.styleable.WaveformSeekBar_wave_width, waveWidth)
         waveGap = ta.getDimension(R.styleable.WaveformSeekBar_wave_gap, waveGap)
+        wavePaddingTop = ta.getDimension(R.styleable.WaveformSeekBar_wave_padding_top, 0F).toInt()
+        wavePaddingBottom = ta.getDimension(R.styleable.WaveformSeekBar_wave_padding_Bottom, 0F).toInt()
+        wavePaddingLeft = ta.getDimension(R.styleable.WaveformSeekBar_wave_padding_left, 0F).toInt()
+        wavePaddingRight = ta.getDimension(R.styleable.WaveformSeekBar_wave_padding_right, 0F).toInt()
         waveCornerRadius = ta.getDimension(R.styleable.WaveformSeekBar_wave_corner_radius, waveCornerRadius)
         waveMinHeight = ta.getDimension(R.styleable.WaveformSeekBar_wave_min_height, waveMinHeight)
         waveBackgroundColor = ta.getColor(R.styleable.WaveformSeekBar_wave_background_color, waveBackgroundColor)
@@ -137,6 +183,9 @@ open class WaveformSeekBar @JvmOverloads constructor(
         waveGravity = WaveGravity.values()[gravity]
         markerWidth = ta.getDimension(R.styleable.WaveformSeekBar_marker_width, markerWidth)
         markerColor = ta.getColor(R.styleable.WaveformSeekBar_marker_color, markerColor)
+        markerTextColor = ta.getColor(R.styleable.WaveformSeekBar_marker_text_color, markerTextColor)
+        markerTextSize = ta.getDimension(R.styleable.WaveformSeekBar_marker_text_size, markerTextSize)
+        markerTextPadding = ta.getDimension(R.styleable.WaveformSeekBar_marker_text_padding, markerTextPadding)
         ta.recycle()
     }
 
@@ -186,7 +235,7 @@ open class WaveformSeekBar @JvmOverloads constructor(
             val totalWaveWidth = waveGap + waveWidth
             var step = waveSample.size / (getAvailableWidth() / totalWaveWidth)
 
-            var previousWaveRight = paddingLeft.toFloat()
+            var previousWaveRight = paddingLeft.toFloat() + wavePaddingLeft
             var sampleItemPosition: Int
 
             val barsToDraw = (getAvailableWidth() / totalWaveWidth).toInt()
@@ -214,15 +263,15 @@ open class WaveformSeekBar @JvmOverloads constructor(
             for (i in start until barsToDraw + start + 3) {
                 sampleItemPosition = floor(i * step).roundToInt()
                 var waveHeight = if (sampleItemPosition >= 0 && sampleItemPosition < waveSample.size)
-                    getAvailableHeight() * (waveSample[sampleItemPosition].toFloat() / mMaxValue)
+                    (getAvailableHeight() - wavePaddingTop - wavePaddingBottom) * (waveSample[sampleItemPosition].toFloat() / mMaxValue)
                 else 0F
 
                 if (waveHeight < waveMinHeight) waveHeight = waveMinHeight
 
                 val top: Float = when (waveGravity) {
-                    WaveGravity.TOP -> paddingTop.toFloat()
-                    WaveGravity.CENTER -> paddingTop + getAvailableHeight() / 2F - waveHeight / 2F
-                    WaveGravity.BOTTOM -> mCanvasHeight - paddingBottom - waveHeight
+                    WaveGravity.TOP -> paddingTop.toFloat() + wavePaddingTop
+                    WaveGravity.CENTER -> (paddingTop + wavePaddingTop + getAvailableHeight()) / 2F - waveHeight / 2F
+                    WaveGravity.BOTTOM -> mCanvasHeight - paddingBottom - wavePaddingBottom - waveHeight
                 }
 
                 mWaveRect.set(previousWaveRight, top, previousWaveRight + waveWidth, top + waveHeight)
@@ -249,26 +298,22 @@ open class WaveformSeekBar @JvmOverloads constructor(
                 previousWaveRight = mWaveRect.right + waveGap
             }
 
+            // TODO: implement for visibleProgress > 0
             //draw markers
-            marker?.forEach {
-                // ToDo implement for visibleProgress > 0
-                if (visibleProgress > 0) {
-                    return;
-                }
-
+            if (visibleProgress <= 0) marker?.forEach {
                 // out of progress range
-                if (it.key < 0 || it.key > maxProgress) return;
+                if (it.key < 0 || it.key > maxProgress) return
 
                 val markerXPosition = getAvailableWidth() * (it.key / maxProgress)
                 mMarkerRect.set(markerXPosition - (markerWidth / 2), 0f, markerXPosition + (markerWidth / 2), getAvailableHeight().toFloat())
                 mMarkerPaint.color = markerColor
-                // ToDo variable font size as attribute
-                mMarkerPaint.textSize = 25f
                 canvas.drawRect(mMarkerRect, mMarkerPaint)
 
-                val markerTextDistance = 10f;
+                val markerTextDistance = markerTextPadding
                 val markerTextXPosition = -markerXPosition - (markerWidth / 2) - markerTextDistance
 
+                mMarkerPaint.textSize = markerTextSize
+                mMarkerPaint.color = markerTextColor
                 canvas.rotate(90f)
                 canvas.drawText(it.value, markerTextDistance, markerTextXPosition, mMarkerPaint)
                 canvas.rotate(-90f)

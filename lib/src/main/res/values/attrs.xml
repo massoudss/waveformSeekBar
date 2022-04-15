@@ -7,6 +7,10 @@
         <attr name="wave_visible_progress" format="float" />
         <attr name="wave_width" format="dimension" />
         <attr name="wave_gap" format="dimension" />
+        <attr name="wave_padding_top" format="dimension" />
+        <attr name="wave_padding_Bottom" format="dimension" />
+        <attr name="wave_padding_left" format="dimension" />
+        <attr name="wave_padding_right" format="dimension" />
         <attr name="wave_min_height" format="dimension" />
         <attr name="wave_corner_radius" format="dimension" />
         <attr name="wave_background_color" format="color" />
@@ -18,6 +22,9 @@
         </attr>
         <attr name="marker_width" format="dimension" />
         <attr name="marker_color" format="color" />
+        <attr name="marker_text_size" format="dimension" />
+        <attr name="marker_text_color" format="color" />
+        <attr name="marker_text_padding" format="dimension" />
     </declare-styleable>
 
 </resources>

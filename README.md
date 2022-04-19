@@ -84,6 +84,13 @@ waveformSeekBar.setSampleFrom("URI")
 // Resource (res/raw)
 waveformSeekBar.setSampleFrom(R.raw.song)
 ```
+### Add markers
+You can add markers to your waveform. Use `setMarker()` to provide a HashMap of positions (float value between 0 and `maxProgress`) and text to display.
+``` kotlin
+val map = hashMapOf<Float,String>()
+map[waveformSeekBar.maxProgress/2] = "The middle"
+waveformSeekBar.setMarker(map)
+```
 
 ### Progress Listener
 ``` kotlin
@@ -144,6 +151,7 @@ You can customize WaveformSeekBar, all of this attributes can change via xml or 
 |marker_text_color|Color|`markerTextColor`|Marker text color, default color is `Color.RED` |
 |marker_text_padding|Dimension|`markerTextPadding`|Marker text padding, default value is `0`|
 | - |IntArray|`sample`|Sample data for drawing waves, default is `null`|
+| - |hashMapOf<Float,String>|`marker`|Marker map for drawing markers, default is `null`|
 
 ### Reduce size
 Add ``` android:extractNativeLibs="false" ``` to application in the Manifest.xml

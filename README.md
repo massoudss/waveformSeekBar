@@ -4,7 +4,7 @@
 Android Waveform SeekBar library
 
 <img src="./files/preview.png" width="500">
-<img src="https://user-images.githubusercontent.com/36920541/159234717-af36d8d9-4407-49ed-83f1-d32900917753.png" width ="500">
+<img src="./files/preview_with_markers.png" width ="500">
 <img src="./files/preview.gif" width="300">
 
 

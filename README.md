@@ -134,11 +134,11 @@ You can customize WaveformSeekBar, all of this attributes can change via xml or 
 |wave_padding_right|Dimension|`wavePaddingRight`|Waves padding width from right, default value is `0`|
 |wave_padding_left|Dimension|`wavePaddingLeft`|Waves padding width from left, default value is `0`|
 |wave_min_height|Dimension|`waveMinHeight`|Minimum height of each wave, default value is equal to `waveWidth`|
-|wave_corner_radius|Dimension|`waveCornerRadius`|Corner raduis of each wave, default value is `2dp`|
+|wave_corner_radius|Dimension|`waveCornerRadius`|Corner radius of each wave, default value is `2dp`|
 |wave_gravity|Enum|`waveGravity`|Waves Gravity, default is `WaveGravity.CENTER`|
-|wave_background_color|Color|`waveBackgroundColor`|UnReached Waves color, default color is `Color.LTGRAY`|
+|wave_background_color|Color|`waveBackgroundColor`|Unreached Waves color, default color is `Color.LTGRAY`|
 |wave_progress_color|Color|`waveProgressColor`|Reached Waves color, default color is `Color.WHITE`|
-|marker_width|Dimension|`markerWidth`|Marker vertical line with, default value is `1dp`|
+|marker_width|Dimension|`markerWidth`|Marker vertical line width, default value is `1dp`|
 |marker_color|Color|`markerColor`|Marker vertical line color, default value is `Color.GREEN`|
 |marker_text_size|Dimension|`markerTextSize`|Marker text size, default value is `12dp`|
 |marker_text_color|Color|`markerTextColor`|Marker text color, default color is `Color.RED` |

@@ -1,5 +1,6 @@
 package com.masoudss.activity
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.database.Cursor
@@ -19,10 +20,11 @@ class SelectAudioActivity : AppCompatActivity() {
 
     private val audioList = ArrayList<AudioModel>()
     private val projection = arrayOf(
-            MediaStore.Audio.Media._ID,
-            MediaStore.Audio.Media.ARTIST,
-            MediaStore.Audio.Media.TITLE,
-            MediaStore.Audio.Media.DATA)
+        MediaStore.Audio.Media._ID,
+        MediaStore.Audio.Media.ARTIST,
+        MediaStore.Audio.Media.TITLE,
+        MediaStore.Audio.Media.DATA
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +38,7 @@ class SelectAudioActivity : AppCompatActivity() {
         audioRecyclerView.adapter = AudioAdapter(this@SelectAudioActivity, audioList)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun loadAudioFiles() {
 
         doAsync {
@@ -43,18 +46,21 @@ class SelectAudioActivity : AppCompatActivity() {
             var cursor: Cursor? = null
             try {
                 cursor = contentResolver.query(
-                        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                        projection,
-                        null,
-                        null,
-                        MediaStore.Audio.Media.DATE_ADDED + " DESC")
+                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    projection,
+                    null,
+                    null,
+                    MediaStore.Audio.Media.DATE_ADDED + " DESC"
+                )
 
                 while (cursor!!.moveToNext()) {
-                    audioList.add(AudioModel(
+                    audioList.add(
+                        AudioModel(
                             title = cursor.getString(1),
                             artist = cursor.getString(2),
                             path = cursor.getString(3)
-                    ))
+                        )
+                    )
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -74,5 +80,4 @@ class SelectAudioActivity : AppCompatActivity() {
         setResult(Activity.RESULT_OK, intent)
         finish()
     }
-
 }

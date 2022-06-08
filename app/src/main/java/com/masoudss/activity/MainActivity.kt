@@ -5,7 +5,6 @@ import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.Resources
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -25,9 +24,6 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-    private val REQ_CODE_PICK_SOUND_FILE = 1
-    private val REQ_CODE_STORAGE_PERMMISION = 2
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -44,7 +40,11 @@ class MainActivity : AppCompatActivity() {
             sample = getDummyWaveSample()
             marker = getDummyMarkerSample()
             onProgressChanged = object : SeekBarOnProgressChanged {
-                override fun onProgressChanged(waveformSeekBar: WaveformSeekBar, progress: Float, fromUser: Boolean) {
+                override fun onProgressChanged(
+                    waveformSeekBar: WaveformSeekBar,
+                    progress: Float,
+                    fromUser: Boolean
+                ) {
                     if (fromUser)
                         waveProgress.progress = progress.toInt()
                 }
@@ -113,7 +113,6 @@ class MainActivity : AppCompatActivity() {
         })
 
         gravityRadioGroup.setOnCheckedChangeListener { _, checkedId ->
-
             val radioButton = gravityRadioGroup.findViewById(checkedId) as RadioButton
             val index = gravityRadioGroup.indexOfChild(radioButton)
             waveformSeekBar.waveGravity = when (index) {
@@ -124,7 +123,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         waveColorRadioGroup.setOnCheckedChangeListener { _, checkedId ->
-
             val radioButton = waveColorRadioGroup.findViewById(checkedId) as RadioButton
             val index = waveColorRadioGroup.indexOfChild(radioButton)
             waveformSeekBar.waveBackgroundColor = when (index) {
@@ -191,7 +189,7 @@ class MainActivity : AppCompatActivity() {
                 permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
             if (permissions.isNotEmpty())
-                requestPermissions(permissions.toTypedArray(), REQ_CODE_STORAGE_PERMMISION)
+                requestPermissions(permissions.toTypedArray(), REQ_CODE_STORAGE_PERMISSION)
             else
                 launchSelectAudioActivity()
 
@@ -199,8 +197,12 @@ class MainActivity : AppCompatActivity() {
             launchSelectAudioActivity()
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        if (requestCode == REQ_CODE_STORAGE_PERMMISION) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == REQ_CODE_STORAGE_PERMISSION) {
             var denied = false
             for (i in permissions.indices)
                 if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
@@ -209,14 +211,16 @@ class MainActivity : AppCompatActivity() {
                 }
 
             if (denied)
-                Toast.makeText(this@MainActivity, getString(R.string.permission_error), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this@MainActivity,
+                    getString(R.string.permission_error),
+                    Toast.LENGTH_SHORT
+                ).show()
             else
                 launchSelectAudioActivity()
-
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         }
-
     }
 
     private fun launchSelectAudioActivity() {
@@ -233,10 +237,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getDummyMarkerSample(): HashMap<Float, String> {
-        val map = hashMapOf<Float,String>()
-        map[waveformSeekBar.maxProgress/2] = "Middle"
-        map[waveformSeekBar.maxProgress/4] = "Quarter"
+        val map = hashMapOf<Float, String>()
+        map[waveformSeekBar.maxProgress / 2] = "Middle"
+        map[waveformSeekBar.maxProgress / 4] = "Quarter"
         return map
     }
 
+    companion object {
+        const val REQ_CODE_PICK_SOUND_FILE = 1
+        const val REQ_CODE_STORAGE_PERMISSION = 2
+    }
 }

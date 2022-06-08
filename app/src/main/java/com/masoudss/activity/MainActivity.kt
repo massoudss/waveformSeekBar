@@ -14,21 +14,26 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.masoudss.R
-import com.masoudss.lib.*
+import com.masoudss.databinding.ActivityMainBinding
+import com.masoudss.lib.SeekBarOnProgressChanged
+import com.masoudss.lib.WaveformSeekBar
 import com.masoudss.lib.utils.Utils
 import com.masoudss.lib.utils.WaveGravity
-import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
-        waveformSeekBar.apply {
+        binding.waveformSeekBar.apply {
             progress = 33.2F
             waveWidth = Utils.dp(this@MainActivity, 5)
             waveGap = Utils.dp(this@MainActivity, 2)
@@ -46,14 +51,15 @@ class MainActivity : AppCompatActivity() {
                     fromUser: Boolean
                 ) {
                     if (fromUser)
-                        waveProgress.progress = progress.toInt()
+                        binding.waveProgress.progress = progress.toInt()
                 }
             }
         }
 
-        waveWidth.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.waveWidth.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                waveformSeekBar.waveWidth = progress / 100F * Utils.dp(this@MainActivity, 20)
+                binding.waveformSeekBar.waveWidth =
+                    progress / 100F * Utils.dp(this@MainActivity, 20)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -61,9 +67,11 @@ class MainActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        waveCornerRadius.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.waveCornerRadius.setOnSeekBarChangeListener(object :
+            SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                waveformSeekBar.waveCornerRadius = progress / 100F * Utils.dp(this@MainActivity, 10)
+                binding.waveformSeekBar.waveCornerRadius =
+                    progress / 100F * Utils.dp(this@MainActivity, 10)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -71,9 +79,9 @@ class MainActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        waveGap.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.waveGap.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                waveformSeekBar.waveGap = progress / 100F * Utils.dp(this@MainActivity, 10)
+                binding.waveformSeekBar.waveGap = progress / 100F * Utils.dp(this@MainActivity, 10)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -81,9 +89,9 @@ class MainActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        waveProgress.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.waveProgress.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                waveformSeekBar.progress = progress.toFloat()
+                binding.waveformSeekBar.progress = progress.toFloat()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -91,10 +99,11 @@ class MainActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        waveMaxProgress.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.waveMaxProgress.setOnSeekBarChangeListener(object :
+            SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                waveProgress.max = progress
-                waveformSeekBar.maxProgress = progress.toFloat()
+                binding.waveProgress.max = progress
+                binding.waveformSeekBar.maxProgress = progress.toFloat()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -102,9 +111,10 @@ class MainActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        visibleProgress.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.visibleProgress.setOnSeekBarChangeListener(object :
+            SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                waveformSeekBar.visibleProgress = progress.toFloat()
+                binding.waveformSeekBar.visibleProgress = progress.toFloat()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -112,45 +122,45 @@ class MainActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        gravityRadioGroup.setOnCheckedChangeListener { _, checkedId ->
-            val radioButton = gravityRadioGroup.findViewById(checkedId) as RadioButton
-            val index = gravityRadioGroup.indexOfChild(radioButton)
-            waveformSeekBar.waveGravity = when (index) {
+        binding.gravityRadioGroup.setOnCheckedChangeListener { _, checkedId ->
+            val radioButton = binding.gravityRadioGroup.findViewById(checkedId) as RadioButton
+            val index = binding.gravityRadioGroup.indexOfChild(radioButton)
+            binding.waveformSeekBar.waveGravity = when (index) {
                 0 -> WaveGravity.TOP
                 1 -> WaveGravity.CENTER
                 else -> WaveGravity.BOTTOM
             }
         }
 
-        waveColorRadioGroup.setOnCheckedChangeListener { _, checkedId ->
-            val radioButton = waveColorRadioGroup.findViewById(checkedId) as RadioButton
-            val index = waveColorRadioGroup.indexOfChild(radioButton)
-            waveformSeekBar.waveBackgroundColor = when (index) {
+        binding.waveColorRadioGroup.setOnCheckedChangeListener { _, checkedId ->
+            val radioButton = binding.waveColorRadioGroup.findViewById(checkedId) as RadioButton
+            val index = binding.waveColorRadioGroup.indexOfChild(radioButton)
+            binding.waveformSeekBar.waveBackgroundColor = when (index) {
                 0 -> ContextCompat.getColor(this, R.color.pink)
                 1 -> ContextCompat.getColor(this, R.color.yellow)
                 else -> ContextCompat.getColor(this, R.color.white)
             }
         }
 
-        progressColorRadioGroup.setOnCheckedChangeListener { _, checkedId ->
+        binding.progressColorRadioGroup.setOnCheckedChangeListener { _, checkedId ->
 
-            val radioButton = progressColorRadioGroup.findViewById(checkedId) as RadioButton
-            val index = progressColorRadioGroup.indexOfChild(radioButton)
-            waveformSeekBar.waveProgressColor = when (index) {
+            val radioButton = binding.progressColorRadioGroup.findViewById(checkedId) as RadioButton
+            val index = binding.progressColorRadioGroup.indexOfChild(radioButton)
+            binding.waveformSeekBar.waveProgressColor = when (index) {
                 0 -> ContextCompat.getColor(this, R.color.red)
                 1 -> ContextCompat.getColor(this, R.color.blue)
                 else -> ContextCompat.getColor(this, R.color.green)
             }
         }
 
-        icGithub.setOnClickListener {
+        binding.icGithub.setOnClickListener {
             val url = "https://github.com/massoudss/waveformSeekBar"
             val i = Intent(Intent.ACTION_VIEW)
             i.data = Uri.parse(url)
             startActivity(i)
         }
 
-        icImport.setOnClickListener {
+        binding.icImport.setOnClickListener {
             checkStoragePermission()
         }
     }
@@ -166,7 +176,7 @@ class MainActivity : AppCompatActivity() {
 
 
             doAsync {
-                waveformSeekBar.setSampleFrom(path!!)
+                binding.waveformSeekBar.setSampleFrom(path!!)
 
                 uiThread {
                     progressDialog.dismiss()
@@ -238,8 +248,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun getDummyMarkerSample(): HashMap<Float, String> {
         val map = hashMapOf<Float, String>()
-        map[waveformSeekBar.maxProgress / 2] = "Middle"
-        map[waveformSeekBar.maxProgress / 4] = "Quarter"
+        map[binding.waveformSeekBar.maxProgress / 2] = "Middle"
+        map[binding.waveformSeekBar.maxProgress / 4] = "Quarter"
         return map
     }
 

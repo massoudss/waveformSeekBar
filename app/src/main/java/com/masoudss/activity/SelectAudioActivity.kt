@@ -8,15 +8,16 @@ import android.os.Bundle
 import android.provider.MediaStore
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.masoudss.R
 import com.masoudss.adapter.AudioAdapter
+import com.masoudss.databinding.ActivitySelectAudioBinding
 import com.masoudss.model.AudioModel
-import kotlinx.android.synthetic.main.activity_select_audio.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
 
 class SelectAudioActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivitySelectAudioBinding
 
     private val audioList = ArrayList<AudioModel>()
     private val projection = arrayOf(
@@ -28,14 +29,16 @@ class SelectAudioActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_select_audio)
+        binding = ActivitySelectAudioBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
         initViews()
         loadAudioFiles()
     }
 
     private fun initViews() {
-        audioRecyclerView.layoutManager = LinearLayoutManager(this)
-        audioRecyclerView.adapter = AudioAdapter(this@SelectAudioActivity, audioList)
+        binding.audioRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.audioRecyclerView.adapter = AudioAdapter(this@SelectAudioActivity, audioList)
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -69,7 +72,7 @@ class SelectAudioActivity : AppCompatActivity() {
             }
 
             uiThread {
-                audioRecyclerView.adapter?.notifyDataSetChanged()
+                binding.audioRecyclerView.adapter?.notifyDataSetChanged()
             }
         }
     }

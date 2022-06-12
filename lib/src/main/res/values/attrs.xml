@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <declare-styleable name="WaveformSeekBar">
         <attr name="wave_progress" format="float" />
         <attr name="wave_max_progress" format="float" />
@@ -26,5 +25,4 @@
         <attr name="marker_text_color" format="color" />
         <attr name="marker_text_padding" format="dimension" />
     </declare-styleable>
-
 </resources>

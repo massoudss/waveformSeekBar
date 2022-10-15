@@ -289,7 +289,7 @@ open class WaveformSeekBar @JvmOverloads constructor(
             for (i in start until barsToDraw + start + 3) {
                 sampleItemPosition = floor(i * step).roundToInt()
                 var waveHeight =
-                    if (sampleItemPosition >= 0 && sampleItemPosition < waveSample.size)
+                    if (sampleItemPosition in waveSample.indices && mMaxValue != 0)
                         (getAvailableHeight() - wavePaddingTop - wavePaddingBottom) * (waveSample[sampleItemPosition].toFloat() / mMaxValue)
                     else 0F
 

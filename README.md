@@ -28,7 +28,7 @@ dependencies {
 
     // Amplitude will allow you to call setSampleFrom() with files, URLs, Uri and resources
     // Important: Only works with api level 21 and higher
-    implementation 'com.github.lincollincol:amplituda:2.1.4' // or newer version
+    implementation 'com.github.lincollincol:amplituda:2.2.2' // or newer version
 }
 ```
 

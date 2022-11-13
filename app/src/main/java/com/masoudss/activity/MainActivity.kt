@@ -16,7 +16,9 @@ import androidx.core.content.ContextCompat
 import com.masoudss.R
 import com.masoudss.databinding.ActivityMainBinding
 import com.masoudss.lib.SeekBarOnProgressChanged
+import com.masoudss.lib.TimelineOnProgressChanged
 import com.masoudss.lib.WaveformSeekBar
+import com.masoudss.lib.WaveformTimeline
 import com.masoudss.lib.utils.Utils
 import com.masoudss.lib.utils.WaveGravity
 import org.jetbrains.anko.doAsync
@@ -44,9 +46,9 @@ class MainActivity : AppCompatActivity() {
             waveProgressColor = ContextCompat.getColor(this@MainActivity, R.color.blue)
             sample = getDummyWaveSample()
             marker = getDummyMarkerSample()
-            onProgressChanged = object : SeekBarOnProgressChanged {
+            onProgressChanged = object : TimelineOnProgressChanged {
                 override fun onProgressChanged(
-                    waveformSeekBar: WaveformSeekBar,
+                    waveformTimeline: WaveformTimeline,
                     progress: Float,
                     fromUser: Boolean
                 ) {

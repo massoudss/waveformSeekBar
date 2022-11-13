@@ -63,7 +63,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.masoudss.lib.WaveformSeekBar
+            <com.masoudss.lib.WaveformTimeline
                 app:wave_progress="33"
                 app:wave_max_progress="100"
                 app:wave_width="5dp"

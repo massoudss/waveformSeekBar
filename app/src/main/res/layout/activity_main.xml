@@ -78,7 +78,7 @@
                 android:id="@+id/waveformSeekBar"
                 android:layout_gravity="center"
                 android:layout_width="300dp"
-                android:layout_height="50dp" />
+                android:layout_height="250dp" />
 
 
             <TextView
@@ -168,7 +168,7 @@
 
             <SeekBar
                 android:min="0"
-                android:max="200"
+                android:max="20000"
                 android:progress="0"
                 android:id="@+id/visibleProgress"
                 android:layout_gravity="center"

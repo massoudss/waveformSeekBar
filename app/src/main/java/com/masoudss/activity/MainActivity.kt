@@ -15,9 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.masoudss.R
 import com.masoudss.databinding.ActivityMainBinding
-import com.masoudss.lib.SeekBarOnProgressChanged
 import com.masoudss.lib.TimelineOnProgressChanged
-import com.masoudss.lib.WaveformSeekBar
 import com.masoudss.lib.WaveformTimeline
 import com.masoudss.lib.utils.Utils
 import com.masoudss.lib.utils.WaveGravity
@@ -34,7 +32,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-
+        binding.waveformSeekBar.isEnabled = false;
         binding.waveformSeekBar.apply {
             progress = 33.2F
             waveWidth = Utils.dp(this@MainActivity, 5)
@@ -44,8 +42,6 @@ class MainActivity : AppCompatActivity() {
             waveGravity = WaveGravity.CENTER
             waveBackgroundColor = ContextCompat.getColor(this@MainActivity, R.color.white)
             waveProgressColor = ContextCompat.getColor(this@MainActivity, R.color.blue)
-            sample = getDummyWaveSample()
-            marker = getDummyMarkerSample()
             onProgressChanged = object : TimelineOnProgressChanged {
                 override fun onProgressChanged(
                     waveformTimeline: WaveformTimeline,
@@ -105,7 +101,6 @@ class MainActivity : AppCompatActivity() {
             SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 binding.waveProgress.max = progress
-                binding.waveformSeekBar.maxProgress = progress.toFloat()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -165,6 +160,7 @@ class MainActivity : AppCompatActivity() {
         binding.icImport.setOnClickListener {
             checkStoragePermission()
         }
+
     }
 
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -176,10 +172,10 @@ class MainActivity : AppCompatActivity() {
             progressDialog.setMessage(getString(R.string.message_waiting))
             progressDialog.show()
 
-
             doAsync {
+                binding.waveformSeekBar.reset()
                 binding.waveformSeekBar.setSampleFrom(path!!)
-
+                binding.waveformSeekBar.play()
                 uiThread {
                     progressDialog.dismiss()
                 }
@@ -246,13 +242,6 @@ class MainActivity : AppCompatActivity() {
             data[i] = Random().nextInt(data.size)
 
         return data
-    }
-
-    private fun getDummyMarkerSample(): HashMap<Float, String> {
-        val map = hashMapOf<Float, String>()
-        map[binding.waveformSeekBar.maxProgress / 2] = "Middle"
-        map[binding.waveformSeekBar.maxProgress / 4] = "Quarter"
-        return map
     }
 
     companion object {

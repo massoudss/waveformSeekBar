@@ -2,8 +2,10 @@ package com.masoudss.lib
 
 import android.content.Context
 import android.graphics.*
+import android.media.MediaPlayer
 import android.net.Uri
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
@@ -30,9 +32,10 @@ open class WaveformTimeline @JvmOverloads constructor(
     private val mProgressCanvas = Canvas()
     private var mMaxValue = Utils.dp(context, 2).toInt()
     private var mTouchDownX = 0F
-    private var mProgress = 0f
     private var mScaledTouchSlop = ViewConfiguration.get(context).scaledTouchSlop
     private var mAlreadyMoved = false
+    private var mPlayer = MediaPlayer()
+    private var mTimestampPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private lateinit var progressBitmap: Bitmap
     private lateinit var progressShader: Shader
 
@@ -41,7 +44,12 @@ open class WaveformTimeline @JvmOverloads constructor(
     var sample: IntArray? = null
         set(value) {
             field = value
+            try {
+                mPlayer.prepare()
+            }catch (e: IllegalStateException){}
             setMaxValue()
+            maxProgress = mPlayer.duration.toFloat()
+            Log.e("TAG",maxProgress.toString())
             invalidate()
         }
 
@@ -52,7 +60,7 @@ open class WaveformTimeline @JvmOverloads constructor(
             onProgressChanged?.onProgressChanged(this, progress, false)
         }
 
-    var maxProgress: Float = 100F
+    private var maxProgress: Float = 100F
         set(value) {
             field = value
             invalidate()
@@ -184,7 +192,6 @@ open class WaveformTimeline @JvmOverloads constructor(
         waveProgressColor =
             ta.getColor(R.styleable.WaveformSeekBar_wave_progress_color, waveProgressColor)
         progress = ta.getFloat(R.styleable.WaveformSeekBar_wave_progress, progress)
-        maxProgress = ta.getFloat(R.styleable.WaveformSeekBar_wave_max_progress, maxProgress)
         visibleProgress =
             ta.getFloat(R.styleable.WaveformSeekBar_wave_visible_progress, visibleProgress)
         val gravity = ta.getString(R.styleable.WaveformSeekBar_wave_gravity)?.toInt()
@@ -199,6 +206,10 @@ open class WaveformTimeline @JvmOverloads constructor(
         markerTextPadding =
             ta.getDimension(R.styleable.WaveformSeekBar_marker_text_padding, markerTextPadding)
         ta.recycle()
+        mTimestampPaint.color = Color.GRAY
+        mTimestampPaint.strokeWidth = 3F
+        mTimestampPaint.textSize = 20F
+        mTimestampPaint.isAntiAlias = true
     }
 
     private fun setMaxValue() {
@@ -217,6 +228,7 @@ open class WaveformTimeline @JvmOverloads constructor(
 
     @ThreadBlocking
     fun setSampleFrom(audio: String) {
+        mPlayer.setDataSource(audio)
         WaveformOptions.getSampleFrom(context, audio) {
             sample = it
         }
@@ -224,6 +236,8 @@ open class WaveformTimeline @JvmOverloads constructor(
 
     @ThreadBlocking
     fun setSampleFrom(@RawRes audio: Int) {
+        val file = context.resources.openRawResourceFd(audio)
+        mPlayer.setDataSource(file.fileDescriptor)
         WaveformOptions.getSampleFrom(context, audio) {
             sample = it
         }
@@ -236,6 +250,15 @@ open class WaveformTimeline @JvmOverloads constructor(
         }
     }
 
+    fun play(){
+        mPlayer.start()
+    }
+    fun pause(){
+        mPlayer.pause()
+    }
+    fun reset(){
+        mPlayer.reset()
+    }
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         mCanvasWidth = w
@@ -266,6 +289,8 @@ open class WaveformTimeline @JvmOverloads constructor(
             val barsToDraw = (getAvailableWidth() / totalWaveWidth).toInt()
             val start: Int
             val progressXPosition: Float
+            progress = mPlayer.currentPosition.toFloat()
+            var zoom: Float = maxProgress/visibleProgress
             if (visibleProgress > 0) {
                 // If visibleProgress is > 0, the bars move instead of the blue colored part
                 step *= visibleProgress / maxProgress
@@ -283,6 +308,31 @@ open class WaveformTimeline @JvmOverloads constructor(
             } else {
                 start = 0
                 progressXPosition = getAvailableWidth() * progress / maxProgress
+                zoom = 1F
+            }
+            //draw Timestamps
+
+            for(i in 0..(maxProgress).toInt() / 1000){
+                val timeX = (getAvailableWidth() / (maxProgress/1000)) * (i*zoom) - start/2
+                canvas.drawLine(timeX,40F,timeX ,getAvailableHeight().toFloat(),mTimestampPaint)
+
+                val minutes = (i / 60).toString()
+                var seconds = (i % 60).toString()
+                var sec = seconds
+                if ((i % 60)< 10) {
+                    sec = "0$seconds"
+                }
+
+                var timecodeStr = "$minutes:$sec"
+
+                val offset = (0.5f * mTimestampPaint.measureText(timecodeStr)) as Float
+
+                canvas.drawText(
+                    timecodeStr,
+                    timeX - offset,
+                    30F,
+                    mTimestampPaint
+                )
             }
 
             // draw waves
@@ -342,13 +392,12 @@ open class WaveformTimeline @JvmOverloads constructor(
                 previousWaveRight = mWaveRect.right + waveGap
             }
 
-            // TODO: implement for visibleProgress > 0
             //draw markers
-            if (visibleProgress <= 0) marker?.forEach {
+            marker?.forEach {
                 // out of progress range
                 if (it.key < 0 || it.key > maxProgress) return
 
-                val markerXPosition = getAvailableWidth() * (it.key / maxProgress)
+                val markerXPosition = getAvailableWidth() * (it.key / maxProgress) + start
                 mMarkerRect.set(
                     markerXPosition - (markerWidth / 2),
                     0f,
@@ -364,9 +413,10 @@ open class WaveformTimeline @JvmOverloads constructor(
                 mMarkerPaint.textSize = markerTextSize
                 mMarkerPaint.color = markerTextColor
                 canvas.rotate(90f)
-                canvas.drawText(it.value, markerTextDistance, markerTextXPosition, mMarkerPaint)
+                canvas.drawText(it.value+start, markerTextDistance, markerTextXPosition, mMarkerPaint)
                 canvas.rotate(-90f)
             }
+
         }
     }
 
@@ -377,7 +427,6 @@ open class WaveformTimeline @JvmOverloads constructor(
             when (event?.action) {
                 MotionEvent.ACTION_DOWN -> {
                     mTouchDownX = event.x
-                    mProgress = progress
                     mAlreadyMoved = false
                 }
                 MotionEvent.ACTION_MOVE -> {
@@ -428,13 +477,13 @@ open class WaveformTimeline @JvmOverloads constructor(
     }
 
     private fun updateProgress(event: MotionEvent) {
-        progress = getProgress(event);
+        progress = getProgress(event)
         onProgressChanged?.onProgressChanged(this, progress, true)
     }
 
     private fun getProgress(event: MotionEvent): Float {
         return if (visibleProgress > 0) {
-            (mProgress - visibleProgress * (event.x - mTouchDownX) / getAvailableWidth()).coerceIn(
+            (mPlayer.currentPosition - visibleProgress * (event.x - mTouchDownX) / getAvailableWidth()).coerceIn(
                 0F,
                 maxProgress
             )

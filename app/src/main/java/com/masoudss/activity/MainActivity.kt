@@ -175,7 +175,7 @@ class MainActivity : AppCompatActivity() {
             doAsync {
                 binding.waveformSeekBar.reset()
                 binding.waveformSeekBar.setSampleFrom(path!!)
-                binding.waveformSeekBar.play()
+                binding.waveformSeekBar.isPlaying = true
                 uiThread {
                     progressDialog.dismiss()
                 }
@@ -205,6 +205,9 @@ class MainActivity : AppCompatActivity() {
             launchSelectAudioActivity()
     }
 
+    override fun onBackPressed() {
+        binding.waveformSeekBar.isPlaying = !binding.waveformSeekBar.isPlaying
+    }
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,

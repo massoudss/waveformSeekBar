@@ -19,6 +19,7 @@ import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
+
 open class WaveformTimeline @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
@@ -46,10 +47,12 @@ open class WaveformTimeline @JvmOverloads constructor(
             field = value
             try {
                 mPlayer.prepare()
-            }catch (e: IllegalStateException){}
+            }catch (e: IllegalStateException){
+                Log.e("WaveformTimeline","Error Preparing audio")
+                e.printStackTrace();
+            }
             setMaxValue()
             maxProgress = mPlayer.duration.toFloat()
-            Log.e("TAG",maxProgress.toString())
             invalidate()
         }
 
@@ -173,7 +176,14 @@ open class WaveformTimeline @JvmOverloads constructor(
             field = value
             invalidate()
         }
-
+    var isPlaying: Boolean = false
+        set(value) {
+            if(value)
+                mPlayer.start()
+            else
+                mPlayer.pause()
+            field = value
+        }
     init {
         val ta = context.obtainStyledAttributes(attrs, R.styleable.WaveformSeekBar)
         waveWidth = ta.getDimension(R.styleable.WaveformSeekBar_wave_width, waveWidth)
@@ -249,13 +259,6 @@ open class WaveformTimeline @JvmOverloads constructor(
             sample = it
         }
     }
-
-    fun play(){
-        mPlayer.start()
-    }
-    fun pause(){
-        mPlayer.pause()
-    }
     fun reset(){
         mPlayer.reset()
     }
@@ -289,8 +292,8 @@ open class WaveformTimeline @JvmOverloads constructor(
             val barsToDraw = (getAvailableWidth() / totalWaveWidth).toInt()
             val start: Int
             val progressXPosition: Float
-            progress = mPlayer.currentPosition.toFloat()
-            var zoom: Float = maxProgress/visibleProgress
+            if(isPlaying)   //Avoid redrawing
+                progress = mPlayer.currentPosition.toFloat()
             if (visibleProgress > 0) {
                 // If visibleProgress is > 0, the bars move instead of the blue colored part
                 step *= visibleProgress / maxProgress
@@ -308,31 +311,6 @@ open class WaveformTimeline @JvmOverloads constructor(
             } else {
                 start = 0
                 progressXPosition = getAvailableWidth() * progress / maxProgress
-                zoom = 1F
-            }
-            //draw Timestamps
-
-            for(i in 0..(maxProgress).toInt() / 1000){
-                val timeX = (getAvailableWidth() / (maxProgress/1000)) * (i*zoom) - start/2
-                canvas.drawLine(timeX,40F,timeX ,getAvailableHeight().toFloat(),mTimestampPaint)
-
-                val minutes = (i / 60).toString()
-                var seconds = (i % 60).toString()
-                var sec = seconds
-                if ((i % 60)< 10) {
-                    sec = "0$seconds"
-                }
-
-                var timecodeStr = "$minutes:$sec"
-
-                val offset = (0.5f * mTimestampPaint.measureText(timecodeStr)) as Float
-
-                canvas.drawText(
-                    timecodeStr,
-                    timeX - offset,
-                    30F,
-                    mTimestampPaint
-                )
             }
 
             // draw waves
@@ -417,7 +395,38 @@ open class WaveformTimeline @JvmOverloads constructor(
                 canvas.rotate(-90f)
             }
 
+            //Draw timestamps
+            val nTimestamp = if(visibleProgress != 0f) {
+                visibleProgress / 1000
+            } else {
+                maxProgress / 1000
+            }
+
+            //TODO Improve drawing (draw only visibles instead of all)
+            for(time in 0 ..(maxProgress/1000).toInt()){
+                val timeX: Float = getAvailableWidth().toFloat() / (maxProgress) * (time * (maxProgress / nTimestamp)) - (start.toFloat() / 2)
+                canvas.drawLine(timeX,40F,timeX ,getAvailableHeight().toFloat(),mTimestampPaint)
+
+                val minutes = (time / 60).toString()
+                val seconds = (time % 60).toString()
+                var sec = seconds
+                if ((time % 60)< 10) {
+                    sec = "0$seconds"
+                }
+
+                val timecodeStr = "$minutes:$sec"
+
+                val offset = (0.5f * mTimestampPaint.measureText(timecodeStr))
+
+                canvas.drawText(
+                    timecodeStr,
+                    timeX - offset,
+                    30F,
+                    mTimestampPaint
+                )
+            }
         }
+        isPlaying = mPlayer.isPlaying
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {

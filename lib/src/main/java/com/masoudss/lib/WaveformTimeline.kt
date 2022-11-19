@@ -18,7 +18,6 @@ import com.masoudss.lib.utils.WaveformOptions
 import java.io.File
 import kotlin.math.abs
 import kotlin.math.floor
-import kotlin.math.max
 import kotlin.math.roundToInt
 
 
@@ -176,6 +175,18 @@ open class WaveformTimeline @JvmOverloads constructor(
             field = value
             invalidate()
         }
+
+    var timestampColor: Int = Color.GRAY
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    var timestampTextSize: Float = Utils.dp(context, 12)
+        set(value) {
+            field = value
+            invalidate()
+        }
     var isPlaying: Boolean = false
         set(value) {
             if(value)
@@ -193,41 +204,44 @@ open class WaveformTimeline @JvmOverloads constructor(
     }
 
     init {
-        val ta = context.obtainStyledAttributes(attrs, R.styleable.WaveformSeekBar)
-        waveWidth = ta.getDimension(R.styleable.WaveformSeekBar_wave_width, waveWidth)
-        waveGap = ta.getDimension(R.styleable.WaveformSeekBar_wave_gap, waveGap)
-        wavePaddingTop = ta.getDimension(R.styleable.WaveformSeekBar_wave_padding_top, 0F).toInt()
+        val ta = context.obtainStyledAttributes(attrs, R.styleable.WaveformTimeline)
+        waveWidth = ta.getDimension(R.styleable.WaveformTimeline_wave_width, waveWidth)
+        waveGap = ta.getDimension(R.styleable.WaveformTimeline_wave_gap, waveGap)
+        wavePaddingTop = ta.getDimension(R.styleable.WaveformTimeline_wave_padding_top, 0F).toInt()
         wavePaddingBottom =
-            ta.getDimension(R.styleable.WaveformSeekBar_wave_padding_Bottom, 0F).toInt()
-        wavePaddingLeft = ta.getDimension(R.styleable.WaveformSeekBar_wave_padding_left, 0F).toInt()
+            ta.getDimension(R.styleable.WaveformTimeline_wave_padding_Bottom, 0F).toInt()
+        wavePaddingLeft = ta.getDimension(R.styleable.WaveformTimeline_wave_padding_left, 0F).toInt()
         wavePaddingRight =
-            ta.getDimension(R.styleable.WaveformSeekBar_wave_padding_right, 0F).toInt()
+            ta.getDimension(R.styleable.WaveformTimeline_wave_padding_right, 0F).toInt()
         waveCornerRadius =
-            ta.getDimension(R.styleable.WaveformSeekBar_wave_corner_radius, waveCornerRadius)
-        waveMinHeight = ta.getDimension(R.styleable.WaveformSeekBar_wave_min_height, waveMinHeight)
+            ta.getDimension(R.styleable.WaveformTimeline_wave_corner_radius, waveCornerRadius)
+        waveMinHeight = ta.getDimension(R.styleable.WaveformTimeline_wave_min_height, waveMinHeight)
         waveBackgroundColor =
-            ta.getColor(R.styleable.WaveformSeekBar_wave_background_color, waveBackgroundColor)
+            ta.getColor(R.styleable.WaveformTimeline_wave_background_color, waveBackgroundColor)
         waveProgressColor =
-            ta.getColor(R.styleable.WaveformSeekBar_wave_progress_color, waveProgressColor)
-        progress = ta.getFloat(R.styleable.WaveformSeekBar_wave_progress, progress)
+            ta.getColor(R.styleable.WaveformTimeline_wave_progress_color, waveProgressColor)
+        timestampColor =
+            ta.getColor(R.styleable.WaveformTimeline_timestamp_color, timestampColor)
+        progress = ta.getFloat(R.styleable.WaveformTimeline_wave_progress, progress)
         visibleProgress =
-            ta.getFloat(R.styleable.WaveformSeekBar_wave_visible_progress, visibleProgress)
-        val gravity = ta.getString(R.styleable.WaveformSeekBar_wave_gravity)?.toInt()
+            ta.getFloat(R.styleable.WaveformTimeline_wave_visible_progress, visibleProgress)
+        val gravity = ta.getString(R.styleable.WaveformTimeline_wave_gravity)?.toInt()
             ?: WaveGravity.CENTER.ordinal
         waveGravity = WaveGravity.values()[gravity]
-        markerWidth = ta.getDimension(R.styleable.WaveformSeekBar_marker_width, markerWidth)
-        markerColor = ta.getColor(R.styleable.WaveformSeekBar_marker_color, markerColor)
+        markerWidth = ta.getDimension(R.styleable.WaveformTimeline_marker_width, markerWidth)
+        markerColor = ta.getColor(R.styleable.WaveformTimeline_marker_color, markerColor)
         markerTextColor =
-            ta.getColor(R.styleable.WaveformSeekBar_marker_text_color, markerTextColor)
+            ta.getColor(R.styleable.WaveformTimeline_marker_text_color, markerTextColor)
         markerTextSize =
-            ta.getDimension(R.styleable.WaveformSeekBar_marker_text_size, markerTextSize)
+            ta.getDimension(R.styleable.WaveformTimeline_marker_text_size, markerTextSize)
         markerTextPadding =
-            ta.getDimension(R.styleable.WaveformSeekBar_marker_text_padding, markerTextPadding)
+            ta.getDimension(R.styleable.WaveformTimeline_marker_text_padding, markerTextPadding)
+        timestampTextSize =
+            ta.getDimension(R.styleable.WaveformTimeline_timestamp_text_size, timestampTextSize)
         ta.recycle()
-        mTimestampPaint.color = Color.GRAY
-        mTimestampPaint.strokeWidth = 3F
-        mTimestampPaint.textSize = 20F
         mTimestampPaint.isAntiAlias = true
+        mTimestampPaint.strokeWidth = 3F
+        mTimestampPaint.textSize = timestampTextSize
         mPlayer.setOnPreparedListener(onPrepared)
     }
 
@@ -321,7 +335,6 @@ open class WaveformTimeline @JvmOverloads constructor(
                 start = 0
                 progressXPosition = getAvailableWidth() * progress / maxProgress
             }
-
             // draw waves
             for (i in start until barsToDraw + start + 3) {
                 sampleItemPosition = floor(i * step).roundToInt()
@@ -410,9 +423,8 @@ open class WaveformTimeline @JvmOverloads constructor(
             } else {
                 maxProgress / 1000
             }
-
+            mTimestampPaint.color = timestampColor
             //TODO Fix problems with waveGap > 0 and waveWidth > 0.525
-            var draw = 0
             if(waveGap <= 0 && waveWidth <= 0.525f){
                 val timeStart: Int =
                     if(visibleProgress > 0)
@@ -421,8 +433,6 @@ open class WaveformTimeline @JvmOverloads constructor(
                         0
                 val timeEnd = timeStart + nTimestamp + 1
                 var time = timeStart
-                Log.e("TAG","TimeStart$timeStart")
-                Log.e("TAG","TimeEnd$timeEnd")
                 while(time < timeEnd){
                     val timeX: Float = (getAvailableWidth().toFloat() / maxProgress) * ( time.toFloat() * (maxProgress / nTimestamp) ) - (start.toFloat() * waveWidth)
                     if(time >= 0){
@@ -434,21 +444,19 @@ open class WaveformTimeline @JvmOverloads constructor(
                             sec = "0$seconds"
                         }
 
-                        val timecodeStr = "$minutes:$sec"
+                        val timeCodeStr = "$minutes:$sec"
 
-                        val offset = (0.5f * mTimestampPaint.measureText(timecodeStr))
+                        val offset = (0.5f * mTimestampPaint.measureText(timeCodeStr))
 
                         canvas.drawText(
-                            timecodeStr,
+                            timeCodeStr,
                             timeX - offset,
                             30F,
                             mTimestampPaint
                         )
-                        draw++
                     }
                     time++
                 }
-                Log.e("TAG","draw$draw")
             }
         }
     }

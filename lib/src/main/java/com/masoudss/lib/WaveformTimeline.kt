@@ -3,6 +3,7 @@ package com.masoudss.lib
 import android.content.Context
 import android.graphics.*
 import android.media.MediaPlayer
+import android.media.MediaPlayer.OnPreparedListener
 import android.net.Uri
 import android.util.AttributeSet
 import android.util.Log
@@ -51,9 +52,7 @@ open class WaveformTimeline @JvmOverloads constructor(
                 Log.e("WaveformTimeline","Error Preparing audio")
                 e.printStackTrace();
             }
-            setMaxValue()
-            maxProgress = mPlayer.duration.toFloat()
-            invalidate()
+            //OnPrepare gets called
         }
 
     var progress: Float = 0F
@@ -182,8 +181,16 @@ open class WaveformTimeline @JvmOverloads constructor(
                 mPlayer.start()
             else
                 mPlayer.pause()
+            invalidate()
             field = value
         }
+
+    private val onPrepared = OnPreparedListener {
+        setMaxValue()
+        maxProgress = mPlayer.duration.toFloat()
+        invalidate()
+    }
+
     init {
         val ta = context.obtainStyledAttributes(attrs, R.styleable.WaveformSeekBar)
         waveWidth = ta.getDimension(R.styleable.WaveformSeekBar_wave_width, waveWidth)
@@ -220,6 +227,7 @@ open class WaveformTimeline @JvmOverloads constructor(
         mTimestampPaint.strokeWidth = 3F
         mTimestampPaint.textSize = 20F
         mTimestampPaint.isAntiAlias = true
+        mPlayer.setOnPreparedListener(onPrepared)
     }
 
     private fun setMaxValue() {
@@ -306,7 +314,7 @@ open class WaveformTimeline @JvmOverloads constructor(
                 // Calculate start change depending on progress, so that it moves smoothly
                 previousWaveRight -= ((progress + intFactor * visibleProgress / barsForProgress * 0.5f) % (visibleProgress / barsForProgress)) / (visibleProgress / barsForProgress) * totalWaveWidth
                 start =
-                    (progress * barsForProgress / visibleProgress - (barsForProgress / 2F)).toInt()
+                    (progress * barsForProgress / visibleProgress - (barsForProgress / 2F)).roundToInt() - 1
                 progressXPosition = getAvailableWidth() * 0.5F
             } else {
                 start = 0
@@ -404,9 +412,9 @@ open class WaveformTimeline @JvmOverloads constructor(
 
             //TODO Improve drawing (draw only visible instead of all)
             val s = (maxProgress / nTimestamp) / 1000
-            Log.e("TAG","MX:$s")
-            for(time in 0 ..(maxProgress/1000).toInt()){
-                val timeX: Float = (getAvailableWidth().toFloat() / maxProgress) * ( time * (maxProgress / nTimestamp) ) - (start/2f)
+            Log.e("TAG","GAP$waveGap , WIDTH$waveWidth")
+            for(time in 0 ..(maxProgress/1000f).toInt()){
+                val timeX: Float = (getAvailableWidth().toFloat() / maxProgress) * ( time * (maxProgress / nTimestamp) ) - (start*0.525f)
                 canvas.drawLine(timeX,40F,timeX ,getAvailableHeight().toFloat(),mTimestampPaint)
 
                 val minutes = (time / 60).toString()
@@ -428,7 +436,6 @@ open class WaveformTimeline @JvmOverloads constructor(
                 )
             }
         }
-        isPlaying = mPlayer.isPlaying
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {

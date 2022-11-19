@@ -52,7 +52,7 @@ open class WaveformTimeline @JvmOverloads constructor(
                 Log.e("WaveformTimeline","Error Preparing audio")
                 e.printStackTrace()
             }
-            //OnPrepare gets called
+            //OnPrepared gets called
         }
 
     var progress: Float = 0F
@@ -161,6 +161,7 @@ open class WaveformTimeline @JvmOverloads constructor(
     var markerTextSize: Float = Utils.dp(context, 12)
         set(value) {
             field = value
+
             invalidate()
         }
 
@@ -182,9 +183,17 @@ open class WaveformTimeline @JvmOverloads constructor(
             invalidate()
         }
 
+    var timestampTextHeight: Int = 0
+        get(){
+            val bounds = Rect()
+            mTimestampPaint.getTextBounds("0", 0, 1, bounds)
+            return bounds.height()
+        }
+
     var timestampTextSize: Float = Utils.dp(context, 12)
         set(value) {
             field = value
+            timestampTextHeight
             invalidate()
         }
     var isPlaying: Boolean = false
@@ -340,7 +349,7 @@ open class WaveformTimeline @JvmOverloads constructor(
                 sampleItemPosition = floor(i * step).roundToInt()
                 var waveHeight =
                     if (sampleItemPosition in waveSample.indices && mMaxValue != 0)
-                        (getAvailableHeight() - wavePaddingTop - wavePaddingBottom) * (waveSample[sampleItemPosition].toFloat() / mMaxValue)
+                        (getAvailableHeight() - wavePaddingTop - wavePaddingBottom) * (waveSample[sampleItemPosition].toFloat() / mMaxValue) - (timestampTextHeight + 10)*2
                     else 0F
 
                 if (waveHeight < waveMinHeight) waveHeight = waveMinHeight
@@ -436,7 +445,7 @@ open class WaveformTimeline @JvmOverloads constructor(
                 while(time < timeEnd){
                     val timeX: Float = (getAvailableWidth().toFloat() / maxProgress) * ( time.toFloat() * (maxProgress / nTimestamp) ) - (start.toFloat() * waveWidth)
                     if(time >= 0){
-                        canvas.drawLine(timeX,40F,timeX ,getAvailableHeight().toFloat(),mTimestampPaint)
+                        canvas.drawLine(timeX,timestampTextHeight+10f,timeX ,getAvailableHeight().toFloat(),mTimestampPaint)
                         val minutes = (time / 60).toString()
                         val seconds = (time % 60).toString()
                         var sec = seconds
@@ -451,7 +460,7 @@ open class WaveformTimeline @JvmOverloads constructor(
                         canvas.drawText(
                             timeCodeStr,
                             timeX - offset,
-                            30F,
+                            timestampTextHeight.toFloat(),
                             mTimestampPaint
                         )
                     }

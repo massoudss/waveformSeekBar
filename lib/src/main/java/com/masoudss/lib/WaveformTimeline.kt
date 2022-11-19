@@ -18,6 +18,7 @@ import com.masoudss.lib.utils.WaveformOptions
 import java.io.File
 import kotlin.math.abs
 import kotlin.math.floor
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 
@@ -50,7 +51,7 @@ open class WaveformTimeline @JvmOverloads constructor(
                 mPlayer.prepare()
             }catch (e: IllegalStateException){
                 Log.e("WaveformTimeline","Error Preparing audio")
-                e.printStackTrace();
+                e.printStackTrace()
             }
             //OnPrepare gets called
         }
@@ -410,30 +411,44 @@ open class WaveformTimeline @JvmOverloads constructor(
                 maxProgress / 1000
             }
 
-            //TODO Improve drawing (draw only visible instead of all)
-            val s = (maxProgress / nTimestamp) / 1000
-            Log.e("TAG","GAP$waveGap , WIDTH$waveWidth")
-            for(time in 0 ..(maxProgress/1000f).toInt()){
-                val timeX: Float = (getAvailableWidth().toFloat() / maxProgress) * ( time * (maxProgress / nTimestamp) ) - (start*0.525f)
-                canvas.drawLine(timeX,40F,timeX ,getAvailableHeight().toFloat(),mTimestampPaint)
+            //TODO Fix problems with waveGap > 0 and waveWidth > 0.525
+            var draw = 0
+            if(waveGap <= 0 && waveWidth <= 0.525f){
+                val timeStart: Int =
+                    if(visibleProgress > 0)
+                        ( (progress - (visibleProgress * 0.5f))/1000 ).toInt()
+                    else
+                        0
+                val timeEnd = timeStart + nTimestamp + 1
+                var time = timeStart
+                Log.e("TAG","TimeStart$timeStart")
+                Log.e("TAG","TimeEnd$timeEnd")
+                while(time < timeEnd){
+                    val timeX: Float = (getAvailableWidth().toFloat() / maxProgress) * ( time.toFloat() * (maxProgress / nTimestamp) ) - (start.toFloat() * waveWidth)
+                    if(time >= 0){
+                        canvas.drawLine(timeX,40F,timeX ,getAvailableHeight().toFloat(),mTimestampPaint)
+                        val minutes = (time / 60).toString()
+                        val seconds = (time % 60).toString()
+                        var sec = seconds
+                        if ((time % 60)< 10) {
+                            sec = "0$seconds"
+                        }
 
-                val minutes = (time / 60).toString()
-                val seconds = (time % 60).toString()
-                var sec = seconds
-                if ((time % 60)< 10) {
-                    sec = "0$seconds"
+                        val timecodeStr = "$minutes:$sec"
+
+                        val offset = (0.5f * mTimestampPaint.measureText(timecodeStr))
+
+                        canvas.drawText(
+                            timecodeStr,
+                            timeX - offset,
+                            30F,
+                            mTimestampPaint
+                        )
+                        draw++
+                    }
+                    time++
                 }
-
-                val timecodeStr = "$minutes:$sec"
-
-                val offset = (0.5f * mTimestampPaint.measureText(timecodeStr))
-
-                canvas.drawText(
-                    timecodeStr,
-                    timeX - offset,
-                    30F,
-                    mTimestampPaint
-                )
+                Log.e("TAG","draw$draw")
             }
         }
     }

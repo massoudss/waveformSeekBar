@@ -176,6 +176,7 @@ class MainActivity : AppCompatActivity() {
                 binding.waveformSeekBar.reset()
                 binding.waveformSeekBar.setSampleFrom(path!!)
                 binding.waveformSeekBar.isPlaying = true
+                binding.waveformSeekBar.isPlaying = false
                 uiThread {
                     progressDialog.dismiss()
                 }

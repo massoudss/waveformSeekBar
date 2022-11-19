@@ -292,7 +292,7 @@ open class WaveformTimeline @JvmOverloads constructor(
             val barsToDraw = (getAvailableWidth() / totalWaveWidth).toInt()
             val start: Int
             val progressXPosition: Float
-            if(isPlaying)   //Avoid redrawing
+            if(mPlayer.isPlaying)   //Avoid redrawing
                 progress = mPlayer.currentPosition.toFloat()
             if (visibleProgress > 0) {
                 // If visibleProgress is > 0, the bars move instead of the blue colored part
@@ -306,7 +306,7 @@ open class WaveformTimeline @JvmOverloads constructor(
                 // Calculate start change depending on progress, so that it moves smoothly
                 previousWaveRight -= ((progress + intFactor * visibleProgress / barsForProgress * 0.5f) % (visibleProgress / barsForProgress)) / (visibleProgress / barsForProgress) * totalWaveWidth
                 start =
-                    (progress * barsForProgress / visibleProgress - (barsForProgress / 2F)).roundToInt() - 1
+                    (progress * barsForProgress / visibleProgress - (barsForProgress / 2F)).toInt()
                 progressXPosition = getAvailableWidth() * 0.5F
             } else {
                 start = 0
@@ -402,9 +402,11 @@ open class WaveformTimeline @JvmOverloads constructor(
                 maxProgress / 1000
             }
 
-            //TODO Improve drawing (draw only visibles instead of all)
+            //TODO Improve drawing (draw only visible instead of all)
+            val s = (maxProgress / nTimestamp) / 1000
+            Log.e("TAG","MX:$s")
             for(time in 0 ..(maxProgress/1000).toInt()){
-                val timeX: Float = getAvailableWidth().toFloat() / (maxProgress) * (time * (maxProgress / nTimestamp)) - (start.toFloat() / 2)
+                val timeX: Float = (getAvailableWidth().toFloat() / maxProgress) * ( time * (maxProgress / nTimestamp) ) - (start/2f)
                 canvas.drawLine(timeX,40F,timeX ,getAvailableHeight().toFloat(),mTimestampPaint)
 
                 val minutes = (time / 60).toString()

@@ -196,6 +196,14 @@ open class WaveformTimeline @JvmOverloads constructor(
             timestampTextHeight
             invalidate()
         }
+
+    var timestampSecondDistance: Int = 1
+        set(value){
+            field = if(value <= 0)
+                1
+            else
+                value
+        }
     var isPlaying: Boolean = false
         set(value) {
             if(value)
@@ -355,7 +363,7 @@ open class WaveformTimeline @JvmOverloads constructor(
                 if (waveHeight < waveMinHeight) waveHeight = waveMinHeight
 
                 val top: Float = when (waveGravity) {
-                    WaveGravity.TOP -> paddingTop.toFloat() + wavePaddingTop
+                    WaveGravity.TOP -> paddingTop.toFloat() + wavePaddingTop + (timestampTextHeight + 10)
                     WaveGravity.CENTER -> (paddingTop + wavePaddingTop + getAvailableHeight()) / 2F - waveHeight / 2F
                     WaveGravity.BOTTOM -> mCanvasHeight - paddingBottom - wavePaddingBottom - waveHeight
                 }
@@ -437,10 +445,10 @@ open class WaveformTimeline @JvmOverloads constructor(
             if(waveGap <= 0 && waveWidth <= 0.525f){
                 val timeStart: Int =
                     if(visibleProgress > 0)
-                        ( (progress - (visibleProgress * 0.5f))/1000 ).toInt()
+                        ( ( ( (progress - (visibleProgress * 0.5f)) / 1000 ).toInt()) /timestampSecondDistance)*timestampSecondDistance
                     else
                         0
-                val timeEnd = timeStart + nTimestamp + 1
+                val timeEnd = (timeStart + nTimestamp + timestampSecondDistance)
                 var time = timeStart
                 while(time < timeEnd){
                     val timeX: Float = (getAvailableWidth().toFloat() / maxProgress) * ( time.toFloat() * (maxProgress / nTimestamp) ) - (start.toFloat() * waveWidth)
@@ -464,7 +472,7 @@ open class WaveformTimeline @JvmOverloads constructor(
                             mTimestampPaint
                         )
                     }
-                    time++
+                    time+=timestampSecondDistance
                 }
             }
         }

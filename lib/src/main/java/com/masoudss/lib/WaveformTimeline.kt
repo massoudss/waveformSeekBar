@@ -8,6 +8,7 @@ import android.net.Uri
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
+import android.view.RoundedCorner
 import android.view.View
 import android.view.ViewConfiguration
 import androidx.annotation.RawRes
@@ -40,7 +41,14 @@ open class WaveformTimeline @JvmOverloads constructor(
     private var mTimestampPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private lateinit var progressBitmap: Bitmap
     private lateinit var progressShader: Shader
-
+    private var millsStart = 3000
+    private var millsEnd = 13500
+    private var roundedCorner = floatArrayOf(
+        10f,10f,
+        10f,10f,
+        10f,10f,
+        10f,10f
+    )
     var onProgressChanged: TimelineOnProgressChanged? = null
 
     var sample: IntArray? = null
@@ -475,6 +483,15 @@ open class WaveformTimeline @JvmOverloads constructor(
                     time+=timestampSecondDistance
                 }
             }
+
+            //TODO Add paint for selector and touch controls
+            var rect = RectF(millsStart/100f,0f,millsEnd/100f, height.toFloat())
+            val path = Path()
+            path.addRoundRect(rect, roundedCorner, Path.Direction.CW)
+            mMarkerPaint.alpha = 30
+
+
+            canvas.drawPath(path,mMarkerPaint)
         }
     }
 

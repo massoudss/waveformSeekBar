@@ -11,9 +11,8 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
 import androidx.annotation.RawRes
+import com.masoudss.lib.utils.*
 import com.masoudss.lib.utils.ThreadBlocking
-import com.masoudss.lib.utils.Utils
-import com.masoudss.lib.utils.WaveGravity
 import com.masoudss.lib.utils.WaveformOptions
 import java.io.File
 import kotlin.math.abs
@@ -41,8 +40,10 @@ open class WaveformTimeline @JvmOverloads constructor(
     private lateinit var progressBitmap: Bitmap
     private lateinit var progressShader: Shader
     private var edit = -1
-    private var millsStart: Long = 0L
-    private var millsEnd: Long = 100L
+    private var selectorStart = Selector()
+    private var selectorEnd = Selector(100)
+    private var selecting = false
+
     private var selectionRect = RectF(0f,0f,0f,getAvailableHeight().toFloat())
 
     private var roundedCorner = floatArrayOf(
@@ -457,8 +458,8 @@ open class WaveformTimeline @JvmOverloads constructor(
 
             //TODO Add paint for selector and touch controls
 
-            selectionRect.left = millsToPixels(millsStart) - (start*waveWidth)
-            selectionRect.right = millsToPixels(millsEnd) - (start*waveWidth)
+            selectionRect.left = millsToPixels(selectorStart.mills) - (start*waveWidth)
+            selectionRect.right = millsToPixels(selectorEnd.mills) - (start*waveWidth)
             selectionRect.bottom = height.toFloat()
             mMarkerPaint.alpha = 30
             canvas.drawRoundRect(selectionRect,roundedCorner[0],roundedCorner[0],mMarkerPaint)
@@ -474,27 +475,29 @@ open class WaveformTimeline @JvmOverloads constructor(
 
         when (event?.action) {
             MotionEvent.ACTION_DOWN -> {
-                val distanceStart = abs(millsToPixels(millsStart) - event.x)
-                val distanceEnd = abs(millsToPixels(millsEnd) - event.x)
-                Log.e("DEB", "")
-                edit = if(distanceStart < 100)
+                edit = if(selectorStart.isTouching(event.x))
                     0
-                else if(distanceEnd < 100 )
+                else if(selectorEnd.isTouching(event.x))
                     1
-                else
-                    -1
+                else -1
+                Log.e("DEB","${event.x}")
             }
-
+            //TODO fix error add the ofset to the event.x (maybe using progress?)
             MotionEvent.ACTION_MOVE -> {
-                Log.e("DEB","Edit: $edit")
                 when(edit) {
                     0 -> {
-                        millsStart = pixelsToMills(event.x)
+                        selectorStart.mills = pixelsToMills(event.x)
+                        selectorStart.position = event.x
                     }
                     1 -> {
-                        millsEnd = pixelsToMills(event.x)
+                        selectorEnd.mills = pixelsToMills(event.x)
+                        selectorEnd.position = event.x
                     }
                 }
+            }
+
+            MotionEvent.ACTION_UP ->{
+                edit = -1
             }
         }
 
@@ -540,6 +543,18 @@ open class WaveformTimeline @JvmOverloads constructor(
                     performClick()
                 }
             }
+        }
+
+        if(selecting){
+            when(event?.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    selectorStart.position = event.x
+                }
+                MotionEvent.ACTION_UP -> {
+                    selectorEnd.position = event.x
+                }
+            }
+            selecting = false
         }
 
         return true

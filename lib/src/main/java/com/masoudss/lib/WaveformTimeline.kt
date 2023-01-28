@@ -8,7 +8,6 @@ import android.net.Uri
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
-import android.view.RoundedCorner
 import android.view.View
 import android.view.ViewConfiguration
 import androidx.annotation.RawRes
@@ -41,8 +40,11 @@ open class WaveformTimeline @JvmOverloads constructor(
     private var mTimestampPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private lateinit var progressBitmap: Bitmap
     private lateinit var progressShader: Shader
-    private var millsStart = 3000
-    private var millsEnd = 13500
+    private var edit = -1
+    private var millsStart: Long = 0L
+    private var millsEnd: Long = 100L
+    private var selectionRect = RectF(0f,0f,0f,getAvailableHeight().toFloat())
+
     private var roundedCorner = floatArrayOf(
         10f,10f,
         10f,10f,
@@ -88,12 +90,6 @@ open class WaveformTimeline @JvmOverloads constructor(
             invalidate()
         }
 
-    var waveGap: Float = Utils.dp(context, 2)
-        set(value) {
-            field = value
-            invalidate()
-        }
-
     var wavePaddingTop: Int = 0
         set(value) {
             field = value
@@ -118,19 +114,9 @@ open class WaveformTimeline @JvmOverloads constructor(
             invalidate()
         }
 
-    var waveWidth: Float = Utils.dp(context, 5)
-        set(value) {
-            field = value
-            invalidate()
-        }
+    var waveWidth: Float = 1f
 
     var waveMinHeight: Float = waveWidth
-        set(value) {
-            field = value
-            invalidate()
-        }
-
-    var waveCornerRadius: Float = Utils.dp(context, 2)
         set(value) {
             field = value
             invalidate()
@@ -191,7 +177,7 @@ open class WaveformTimeline @JvmOverloads constructor(
             invalidate()
         }
 
-    var timestampTextHeight: Int = 0
+    private val timestampTextHeight: Int
         get(){
             val bounds = Rect()
             mTimestampPaint.getTextBounds("0", 0, 1, bounds)
@@ -231,39 +217,26 @@ open class WaveformTimeline @JvmOverloads constructor(
     init {
         val ta = context.obtainStyledAttributes(attrs, R.styleable.WaveformTimeline)
         waveWidth = ta.getDimension(R.styleable.WaveformTimeline_wave_width, waveWidth)
-        waveGap = ta.getDimension(R.styleable.WaveformTimeline_wave_gap, waveGap)
         wavePaddingTop = ta.getDimension(R.styleable.WaveformTimeline_wave_padding_top, 0F).toInt()
-        wavePaddingBottom =
-            ta.getDimension(R.styleable.WaveformTimeline_wave_padding_Bottom, 0F).toInt()
+        wavePaddingBottom = ta.getDimension(R.styleable.WaveformTimeline_wave_padding_Bottom, 0F).toInt()
         wavePaddingLeft = ta.getDimension(R.styleable.WaveformTimeline_wave_padding_left, 0F).toInt()
-        wavePaddingRight =
-            ta.getDimension(R.styleable.WaveformTimeline_wave_padding_right, 0F).toInt()
-        waveCornerRadius =
-            ta.getDimension(R.styleable.WaveformTimeline_wave_corner_radius, waveCornerRadius)
+        wavePaddingRight = ta.getDimension(R.styleable.WaveformTimeline_wave_padding_right, 0F).toInt()
         waveMinHeight = ta.getDimension(R.styleable.WaveformTimeline_wave_min_height, waveMinHeight)
-        waveBackgroundColor =
-            ta.getColor(R.styleable.WaveformTimeline_wave_background_color, waveBackgroundColor)
-        waveProgressColor =
-            ta.getColor(R.styleable.WaveformTimeline_wave_progress_color, waveProgressColor)
-        timestampColor =
-            ta.getColor(R.styleable.WaveformTimeline_timestamp_color, timestampColor)
+        waveBackgroundColor = ta.getColor(R.styleable.WaveformTimeline_wave_background_color, waveBackgroundColor)
+        waveProgressColor = ta.getColor(R.styleable.WaveformTimeline_wave_progress_color, waveProgressColor)
+        timestampColor = ta.getColor(R.styleable.WaveformTimeline_timestamp_color, timestampColor)
         progress = ta.getFloat(R.styleable.WaveformTimeline_wave_progress, progress)
-        visibleProgress =
-            ta.getFloat(R.styleable.WaveformTimeline_wave_visible_progress, visibleProgress)
-        val gravity = ta.getString(R.styleable.WaveformTimeline_wave_gravity)?.toInt()
-            ?: WaveGravity.CENTER.ordinal
+        visibleProgress = ta.getFloat(R.styleable.WaveformTimeline_wave_visible_progress, visibleProgress)
+        val gravity = ta.getString(R.styleable.WaveformTimeline_wave_gravity)?.toInt() ?: WaveGravity.CENTER.ordinal
         waveGravity = WaveGravity.values()[gravity]
         markerWidth = ta.getDimension(R.styleable.WaveformTimeline_marker_width, markerWidth)
         markerColor = ta.getColor(R.styleable.WaveformTimeline_marker_color, markerColor)
-        markerTextColor =
-            ta.getColor(R.styleable.WaveformTimeline_marker_text_color, markerTextColor)
-        markerTextSize =
-            ta.getDimension(R.styleable.WaveformTimeline_marker_text_size, markerTextSize)
-        markerTextPadding =
-            ta.getDimension(R.styleable.WaveformTimeline_marker_text_padding, markerTextPadding)
-        timestampTextSize =
-            ta.getDimension(R.styleable.WaveformTimeline_timestamp_text_size, timestampTextSize)
+        markerTextColor = ta.getColor(R.styleable.WaveformTimeline_marker_text_color, markerTextColor)
+        markerTextSize = ta.getDimension(R.styleable.WaveformTimeline_marker_text_size, markerTextSize)
+        markerTextPadding = ta.getDimension(R.styleable.WaveformTimeline_marker_text_padding, markerTextPadding)
+        timestampTextSize = ta.getDimension(R.styleable.WaveformTimeline_timestamp_text_size, timestampTextSize)
         ta.recycle()
+        selectionRect = RectF(0f,height.toFloat(),0f,0f)
         mTimestampPaint.isAntiAlias = true
         mTimestampPaint.strokeWidth = 3F
         mTimestampPaint.textSize = timestampTextSize
@@ -331,13 +304,12 @@ open class WaveformTimeline @JvmOverloads constructor(
                 mCanvasWidth - paddingRight,
                 mCanvasHeight - paddingBottom
             )
-            val totalWaveWidth = waveGap + waveWidth
-            var step = waveSample.size / (getAvailableWidth() / totalWaveWidth)
+            var step = waveSample.size / (getAvailableWidth() / waveWidth)
 
             var previousWaveRight = paddingLeft.toFloat() + wavePaddingLeft
             var sampleItemPosition: Int
 
-            val barsToDraw = (getAvailableWidth() / totalWaveWidth).toInt()
+            val barsToDraw = (getAvailableWidth() / waveWidth).toInt()
             val start: Int
             val progressXPosition: Float
             if(mPlayer.isPlaying)   //Avoid redrawing
@@ -349,12 +321,11 @@ open class WaveformTimeline @JvmOverloads constructor(
                 // intFactor is required as depending on whether an equal number of bars must be drawn, the start will switch differently
                 val intFactor = (((barsForProgress + 1) % 2))
                 // Calculate fixed start change depending
-                previousWaveRight += (getAvailableWidth() * 0.5F) % totalWaveWidth
-                previousWaveRight += intFactor * 0.5F * totalWaveWidth - totalWaveWidth
+                previousWaveRight += (getAvailableWidth() * 0.5F) % waveWidth
+                previousWaveRight += intFactor * 0.5F * waveWidth - waveWidth
                 // Calculate start change depending on progress, so that it moves smoothly
-                previousWaveRight -= ((progress + intFactor * visibleProgress / barsForProgress * 0.5f) % (visibleProgress / barsForProgress)) / (visibleProgress / barsForProgress) * totalWaveWidth
-                start =
-                    (progress * barsForProgress / visibleProgress - (barsForProgress / 2F)).roundToInt() - 1
+                previousWaveRight -= ((progress + intFactor * visibleProgress / barsForProgress * 0.5f) % (visibleProgress / barsForProgress)) / (visibleProgress / barsForProgress) * waveWidth
+                start = (progress * barsForProgress / visibleProgress - (barsForProgress / 2F)).roundToInt() - 1
                 progressXPosition = getAvailableWidth() * 0.5F
             } else {
                 start = 0
@@ -413,8 +384,8 @@ open class WaveformTimeline @JvmOverloads constructor(
                         mWavePaint.shader = null
                     }
                 }
-                canvas.drawRoundRect(mWaveRect, waveCornerRadius, waveCornerRadius, mWavePaint)
-                previousWaveRight = mWaveRect.right + waveGap
+                canvas.drawRect(mWaveRect,mWavePaint)
+                previousWaveRight = mWaveRect.right
             }
 
             //draw markers
@@ -450,7 +421,7 @@ open class WaveformTimeline @JvmOverloads constructor(
             }
             mTimestampPaint.color = timestampColor
             //TODO Fix problems with waveGap > 0 and waveWidth > 0.525
-            if(waveGap <= 0 && waveWidth <= 0.525f){
+            if(waveWidth <= 0.525f){
                 val timeStart: Int =
                     if(visibleProgress > 0)
                         ( ( ( (progress - (visibleProgress * 0.5f)) / 1000 ).toInt()) /timestampSecondDistance)*timestampSecondDistance
@@ -485,22 +456,53 @@ open class WaveformTimeline @JvmOverloads constructor(
             }
 
             //TODO Add paint for selector and touch controls
-            var rect = RectF(millsStart/100f,0f,millsEnd/100f, height.toFloat())
-            val path = Path()
-            path.addRoundRect(rect, roundedCorner, Path.Direction.CW)
+
+            selectionRect.left = millsToPixels(millsStart) - (start*waveWidth)
+            selectionRect.right = millsToPixels(millsEnd) - (start*waveWidth)
+            selectionRect.bottom = height.toFloat()
             mMarkerPaint.alpha = 30
-
-
-            canvas.drawPath(path,mMarkerPaint)
+            canvas.drawRoundRect(selectionRect,roundedCorner[0],roundedCorner[0],mMarkerPaint)
         }
+        //TODO REMOVE
+        invalidate()
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
+
         if (!isEnabled)
             return false
-        if (visibleProgress > 0) {
+
+        when (event?.action) {
+            MotionEvent.ACTION_DOWN -> {
+                val distanceStart = abs(millsToPixels(millsStart) - event.x)
+                val distanceEnd = abs(millsToPixels(millsEnd) - event.x)
+                Log.e("DEB", "")
+                edit = if(distanceStart < 100)
+                    0
+                else if(distanceEnd < 100 )
+                    1
+                else
+                    -1
+            }
+
+            MotionEvent.ACTION_MOVE -> {
+                Log.e("DEB","Edit: $edit")
+                when(edit) {
+                    0 -> {
+                        millsStart = pixelsToMills(event.x)
+                    }
+                    1 -> {
+                        millsEnd = pixelsToMills(event.x)
+                    }
+                }
+            }
+        }
+
+        if(edit == -1)
+            if (visibleProgress > 0) {
             when (event?.action) {
                 MotionEvent.ACTION_DOWN -> {
+                    mPlayer.pause()
                     mTouchDownX = event.x
                     mAlreadyMoved = false
                 }
@@ -511,27 +513,35 @@ open class WaveformTimeline @JvmOverloads constructor(
                     }
                 }
                 MotionEvent.ACTION_UP -> {
+                    mPlayer.seekTo(getProgress(event).toInt())
                     performClick()
                 }
             }
         } else {
-            when (event?.action) {
+                when (event?.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    if (isParentScrolling())
+                    if (isParentScrolling()) {
                         mTouchDownX = event.x
-                    else
+                        mPlayer.pause()
+                    }
+                    else {
                         updateProgress(event)
+                        mPlayer.pause()
+                    }
                 }
                 MotionEvent.ACTION_MOVE -> {
                     updateProgress(event)
                 }
                 MotionEvent.ACTION_UP -> {
-                    if (abs(event.x - mTouchDownX) > mScaledTouchSlop)
+                    if (abs(event.x - mTouchDownX) > mScaledTouchSlop) {
                         updateProgress(event)
+                        mPlayer.seekTo(getProgress(event).toInt())
+                    }
                     performClick()
                 }
             }
         }
+
         return true
     }
 
@@ -582,5 +592,14 @@ open class WaveformTimeline @JvmOverloads constructor(
         var height = mCanvasHeight - paddingTop - paddingBottom
         if (height <= 0) height = 1
         return height
+    }
+
+    private fun millsToPixels(mills: Long): Float {
+        return (mills / visibleProgress) * getAvailableWidth()
+    }
+
+    private fun pixelsToMills(pixel: Float): Long {
+        val offset = (progress - visibleProgress / 2)
+        return (visibleProgress * (pixel / getAvailableWidth()) + offset).toLong()
     }
 }

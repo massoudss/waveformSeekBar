@@ -32,13 +32,11 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        binding.waveformSeekBar.isEnabled = false;
+//        binding.waveformSeekBar.isEnabled = false;
         binding.waveformSeekBar.apply {
             progress = 33.2F
             waveWidth = Utils.dp(this@MainActivity, 5)
-            waveGap = Utils.dp(this@MainActivity, 2)
             waveMinHeight = Utils.dp(this@MainActivity, 5)
-            waveCornerRadius = Utils.dp(this@MainActivity, 2)
             waveGravity = WaveGravity.CENTER
             waveBackgroundColor = ContextCompat.getColor(this@MainActivity, R.color.white)
             waveProgressColor = ContextCompat.getColor(this@MainActivity, R.color.blue)
@@ -68,18 +66,6 @@ class MainActivity : AppCompatActivity() {
         binding.waveCornerRadius.setOnSeekBarChangeListener(object :
             SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                binding.waveformSeekBar.waveCornerRadius =
-                    progress / 100F * Utils.dp(this@MainActivity, 10)
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
-
-        binding.waveGap.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                binding.waveformSeekBar.waveGap = progress / 100F * Utils.dp(this@MainActivity, 10)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}

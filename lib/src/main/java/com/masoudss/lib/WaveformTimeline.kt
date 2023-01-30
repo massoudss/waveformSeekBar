@@ -334,7 +334,7 @@ open class WaveformTimeline @JvmOverloads constructor(
             val progressXPosition: Float
             if(mPlayer.isPlaying)   //Avoid redrawing
                 progress = mPlayer.currentPosition.toFloat()
-            if (visibleProgress > 0) {
+            if (zoomed()) {
                 // If visibleProgress is > 0, the bars move instead of the blue colored part
                 step *= visibleProgress / maxProgress
                 val barsForProgress = barsToDraw + 1
@@ -443,7 +443,7 @@ open class WaveformTimeline @JvmOverloads constructor(
             //TODO Fix problems with waveGap > 0 and waveWidth > 0.525
             if(waveWidth <= 0.525f){
                 val timeStart: Int =
-                    if(visibleProgress > 0)
+                    if(zoomed())
                         ( ( ( (progress - (visibleProgress * 0.5f)) / 1000 ).toInt()) /timestampSecondDistance)*timestampSecondDistance
                     else
                         0
@@ -476,10 +476,10 @@ open class WaveformTimeline @JvmOverloads constructor(
             }
 
             if(selectorStart.mills != selectorEnd.mills) {
-                selectionRect.left = millsToPixels(selectorStart.mills)
-                selectionRect.right = millsToPixels(selectorEnd.mills)
-                selectionRect.bottom = height.toFloat()
+                selectionRect.left = if (zoomed()) millsToPixels(selectorStart.mills) else millsToPixelsFlat(selectorStart.mills)
+                selectionRect.right = if (zoomed()) millsToPixels(selectorEnd.mills) else millsToPixelsFlat(selectorEnd.mills)
 
+                selectionRect.bottom = height.toFloat()
                 mSelectorPaint.style = Paint.Style.FILL
                 mSelectorPaint.color = selectionColor
                 mSelectorPaint.alpha = 30
@@ -513,11 +513,16 @@ open class WaveformTimeline @JvmOverloads constructor(
         if(selecting){
             when(event.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    selectorStart.mills = pixelsToMills(event.x)
+                    if(zoomed())
+                        selectorStart.mills = pixelsToMills(event.x)
+                    else
+                        selectorStart.mills = ((maxProgress/width)*event.x).toLong()
                 }
                 MotionEvent.ACTION_MOVE -> {
-                    selectorEnd.mills = pixelsToMills(event.x)
-                    Log.e("DEB","${selectorStart.mills}, ${selectorEnd.mills}")
+                    if(zoomed())
+                        selectorEnd.mills = pixelsToMills(event.x)
+                    else
+                        selectorEnd.mills = ((maxProgress/width)*event.x).toLong()
                     invalidate()
                 }
                 MotionEvent.ACTION_UP ->{
@@ -529,20 +534,35 @@ open class WaveformTimeline @JvmOverloads constructor(
 
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-                edit = if(isTouching(selectorStart,event.x))
-                    0
-                else if(isTouching(selectorEnd,event.x))
-                    1
-                else -1
+                /*Yeah, that's horrible to see
+                   if visibleProgress > 0 uses isTouching
+                   else uses isTouchingFlat
+                   Possible `edit` values
+                     0: start selector
+                     1: end selector
+                    -1: just move the progress
+                */
+                edit = if (zoomed())
+                    if(isTouching(selectorStart,event.x))
+                        0
+                    else if(isTouching(selectorEnd,event.x))
+                        1
+                    else -1
+                else
+                    if(isTouchingFlat(selectorStart,event.x))
+                        0
+                    else if(isTouchingFlat(selectorEnd,event.x))
+                        1
+                    else -1
             }
 
             MotionEvent.ACTION_MOVE -> {
                 when(edit) {
                     0 -> {
-                        selectorStart.mills = pixelsToMills(event.x)
+                        selectorStart.mills = if (zoomed()) pixelsToMills(event.x) else pixelsToMillsFlat(event.x)
                     }
                     1 -> {
-                        selectorEnd.mills = pixelsToMills(event.x)
+                        selectorEnd.mills = if (zoomed()) pixelsToMills(event.x) else pixelsToMillsFlat(event.x)
                     }
                 }
                 invalidate()
@@ -551,7 +571,7 @@ open class WaveformTimeline @JvmOverloads constructor(
         }
 
         if(edit == -1)
-            if (visibleProgress > 0) {
+            if (zoomed()) {
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     wasPlaying = isPlaying
@@ -630,7 +650,7 @@ open class WaveformTimeline @JvmOverloads constructor(
     }
 
     private fun getProgress(event: MotionEvent): Float {
-        return if (visibleProgress > 0) {
+        return if (zoomed()) {
             (mPlayer.currentPosition - visibleProgress * (event.x - mTouchDownX) / getAvailableWidth()).coerceIn(
                 0F,
                 maxProgress
@@ -667,8 +687,24 @@ open class WaveformTimeline @JvmOverloads constructor(
         return (visibleProgress * (pixel / getAvailableWidth()) + offset).toLong()
     }
 
+    private fun millsToPixelsFlat(mills: Long): Float{
+        return width/maxProgress * mills
+    }
+
+    private fun pixelsToMillsFlat(pixel: Float): Long{
+        return (maxProgress/width * pixel).toLong()
+    }
+
     private fun isTouching(selector: Selector,touchPosition: Float): Boolean{
         val distance = abs(millsToPixels(selector.mills) - touchPosition)
         return distance < selector.distanceThreshold
+    }
+
+    private fun isTouchingFlat(selector: Selector, touchPosition: Float): Boolean{
+        return abs(millsToPixelsFlat(selector.mills) - touchPosition) < selector.distanceThreshold
+    }
+
+    private fun zoomed(): Boolean{
+        return visibleProgress > 0
     }
 }

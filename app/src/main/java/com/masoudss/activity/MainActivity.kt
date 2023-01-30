@@ -32,8 +32,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-//        binding.waveformSeekBar.isEnabled = false;
-        binding.waveformSeekBar.apply {
+        binding.waveformTimeLine.apply {
             progress = 33.2F
             waveWidth = Utils.dp(this@MainActivity, 5)
             waveMinHeight = Utils.dp(this@MainActivity, 5)
@@ -54,7 +53,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.waveWidth.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                binding.waveformSeekBar.waveWidth =
+                binding.waveformTimeLine.waveWidth =
                     progress / 100F * Utils.dp(this@MainActivity, 20)
             }
 
@@ -75,7 +74,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.waveProgress.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                binding.waveformSeekBar.progress = progress.toFloat()
+                binding.waveformTimeLine.progress = progress.toFloat()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -97,7 +96,7 @@ class MainActivity : AppCompatActivity() {
         binding.visibleProgress.setOnSeekBarChangeListener(object :
             SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                binding.waveformSeekBar.visibleProgress = progress.toFloat()
+                binding.waveformTimeLine.visibleProgress = progress.toFloat()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -108,7 +107,7 @@ class MainActivity : AppCompatActivity() {
         binding.gravityRadioGroup.setOnCheckedChangeListener { _, checkedId ->
             val radioButton = binding.gravityRadioGroup.findViewById(checkedId) as RadioButton
             val index = binding.gravityRadioGroup.indexOfChild(radioButton)
-            binding.waveformSeekBar.waveGravity = when (index) {
+            binding.waveformTimeLine.waveGravity = when (index) {
                 0 -> WaveGravity.TOP
                 1 -> WaveGravity.CENTER
                 else -> WaveGravity.BOTTOM
@@ -118,7 +117,7 @@ class MainActivity : AppCompatActivity() {
         binding.waveColorRadioGroup.setOnCheckedChangeListener { _, checkedId ->
             val radioButton = binding.waveColorRadioGroup.findViewById(checkedId) as RadioButton
             val index = binding.waveColorRadioGroup.indexOfChild(radioButton)
-            binding.waveformSeekBar.waveBackgroundColor = when (index) {
+            binding.waveformTimeLine.waveBackgroundColor = when (index) {
                 0 -> ContextCompat.getColor(this, R.color.pink)
                 1 -> ContextCompat.getColor(this, R.color.yellow)
                 else -> ContextCompat.getColor(this, R.color.white)
@@ -129,7 +128,7 @@ class MainActivity : AppCompatActivity() {
 
             val radioButton = binding.progressColorRadioGroup.findViewById(checkedId) as RadioButton
             val index = binding.progressColorRadioGroup.indexOfChild(radioButton)
-            binding.waveformSeekBar.waveProgressColor = when (index) {
+            binding.waveformTimeLine.waveProgressColor = when (index) {
                 0 -> ContextCompat.getColor(this, R.color.red)
                 1 -> ContextCompat.getColor(this, R.color.blue)
                 else -> ContextCompat.getColor(this, R.color.green)
@@ -137,7 +136,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.icGithub.setOnClickListener {
-            val url = "https://github.com/massoudss/waveformSeekBar"
+            val url = "https://github.com/massoudss/waveformTimeLine"
             val i = Intent(Intent.ACTION_VIEW)
             i.data = Uri.parse(url)
             startActivity(i)
@@ -159,8 +158,8 @@ class MainActivity : AppCompatActivity() {
             progressDialog.show()
 
             doAsync {
-                binding.waveformSeekBar.reset()
-                binding.waveformSeekBar.setSampleFrom(path!!)
+                binding.waveformTimeLine.reset()
+                binding.waveformTimeLine.setSampleFrom(path!!)
                 uiThread {
                     progressDialog.dismiss()
                 }
@@ -191,7 +190,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        binding.waveformSeekBar.isPlaying = !binding.waveformSeekBar.isPlaying
+        binding.waveformTimeLine.isPlaying = !binding.waveformTimeLine.isPlaying
     }
     override fun onRequestPermissionsResult(
         requestCode: Int,

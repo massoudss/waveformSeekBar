@@ -76,7 +76,7 @@
                 app:timestamp_text_size="10dp"
                 android:layout_marginTop="32dp"
                 android:layout_marginBottom="16dp"
-                android:id="@+id/waveformSeekBar"
+                android:id="@+id/waveformTimeLine"
                 android:layout_gravity="center"
                 android:layout_width="300dp"
                 android:layout_height="250dp" />

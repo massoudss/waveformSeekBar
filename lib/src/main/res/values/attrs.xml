@@ -25,4 +25,31 @@
         <attr name="marker_text_color" format="color" />
         <attr name="marker_text_padding" format="dimension" />
     </declare-styleable>
+
+    <declare-styleable name="WaveformTimeline">
+        <attr name="wave_progress"/>
+        <attr name="wave_max_progress"/>
+        <attr name="wave_visible_progress"/>
+        <attr name="wave_width"/>
+        <attr name="wave_gap"/>
+        <attr name="wave_padding_top"/>
+        <attr name="wave_padding_Bottom"/>
+        <attr name="wave_padding_left"/>
+        <attr name="wave_padding_right"/>
+        <attr name="wave_min_height"/>
+        <attr name="wave_corner_radius"/>
+        <attr name="wave_background_color"/>
+        <attr name="wave_progress_color"/>
+        <attr name="wave_gravity"/>
+        <attr name="marker_width"/>
+        <attr name="marker_color"/>
+        <attr name="marker_text_size"/>
+        <attr name="marker_text_color"/>
+        <attr name="marker_text_padding"/>
+        <attr name="selection_color" format="color"/>
+        <attr name="selection_stroke_color" format="color"/>
+        <attr name="timestamp_color" format="color"/>
+        <attr name="timestamp_text_size" format="dimension"/>
+    </declare-styleable>
+
 </resources>

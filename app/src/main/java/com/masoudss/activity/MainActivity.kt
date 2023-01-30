@@ -15,8 +15,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.masoudss.R
 import com.masoudss.databinding.ActivityMainBinding
-import com.masoudss.lib.SeekBarOnProgressChanged
-import com.masoudss.lib.WaveformSeekBar
+import com.masoudss.lib.TimelineOnProgressChanged
+import com.masoudss.lib.WaveformTimeline
 import com.masoudss.lib.utils.Utils
 import com.masoudss.lib.utils.WaveGravity
 import org.jetbrains.anko.doAsync
@@ -32,21 +32,16 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-
-        binding.waveformSeekBar.apply {
+        binding.waveformTimeLine.apply {
             progress = 33.2F
             waveWidth = Utils.dp(this@MainActivity, 5)
-            waveGap = Utils.dp(this@MainActivity, 2)
             waveMinHeight = Utils.dp(this@MainActivity, 5)
-            waveCornerRadius = Utils.dp(this@MainActivity, 2)
             waveGravity = WaveGravity.CENTER
             waveBackgroundColor = ContextCompat.getColor(this@MainActivity, R.color.white)
             waveProgressColor = ContextCompat.getColor(this@MainActivity, R.color.blue)
-            sample = getDummyWaveSample()
-            marker = getDummyMarkerSample()
-            onProgressChanged = object : SeekBarOnProgressChanged {
+            onProgressChanged = object : TimelineOnProgressChanged {
                 override fun onProgressChanged(
-                    waveformSeekBar: WaveformSeekBar,
+                    waveformTimeline: WaveformTimeline,
                     progress: Float,
                     fromUser: Boolean
                 ) {
@@ -58,7 +53,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.waveWidth.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                binding.waveformSeekBar.waveWidth =
+                binding.waveformTimeLine.waveWidth =
                     progress / 100F * Utils.dp(this@MainActivity, 20)
             }
 
@@ -70,18 +65,6 @@ class MainActivity : AppCompatActivity() {
         binding.waveCornerRadius.setOnSeekBarChangeListener(object :
             SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                binding.waveformSeekBar.waveCornerRadius =
-                    progress / 100F * Utils.dp(this@MainActivity, 10)
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
-
-        binding.waveGap.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                binding.waveformSeekBar.waveGap = progress / 100F * Utils.dp(this@MainActivity, 10)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -91,7 +74,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.waveProgress.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                binding.waveformSeekBar.progress = progress.toFloat()
+                binding.waveformTimeLine.progress = progress.toFloat()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -103,7 +86,6 @@ class MainActivity : AppCompatActivity() {
             SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 binding.waveProgress.max = progress
-                binding.waveformSeekBar.maxProgress = progress.toFloat()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -114,7 +96,7 @@ class MainActivity : AppCompatActivity() {
         binding.visibleProgress.setOnSeekBarChangeListener(object :
             SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                binding.waveformSeekBar.visibleProgress = progress.toFloat()
+                binding.waveformTimeLine.visibleProgress = progress.toFloat()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -125,7 +107,7 @@ class MainActivity : AppCompatActivity() {
         binding.gravityRadioGroup.setOnCheckedChangeListener { _, checkedId ->
             val radioButton = binding.gravityRadioGroup.findViewById(checkedId) as RadioButton
             val index = binding.gravityRadioGroup.indexOfChild(radioButton)
-            binding.waveformSeekBar.waveGravity = when (index) {
+            binding.waveformTimeLine.waveGravity = when (index) {
                 0 -> WaveGravity.TOP
                 1 -> WaveGravity.CENTER
                 else -> WaveGravity.BOTTOM
@@ -135,7 +117,7 @@ class MainActivity : AppCompatActivity() {
         binding.waveColorRadioGroup.setOnCheckedChangeListener { _, checkedId ->
             val radioButton = binding.waveColorRadioGroup.findViewById(checkedId) as RadioButton
             val index = binding.waveColorRadioGroup.indexOfChild(radioButton)
-            binding.waveformSeekBar.waveBackgroundColor = when (index) {
+            binding.waveformTimeLine.waveBackgroundColor = when (index) {
                 0 -> ContextCompat.getColor(this, R.color.pink)
                 1 -> ContextCompat.getColor(this, R.color.yellow)
                 else -> ContextCompat.getColor(this, R.color.white)
@@ -146,7 +128,7 @@ class MainActivity : AppCompatActivity() {
 
             val radioButton = binding.progressColorRadioGroup.findViewById(checkedId) as RadioButton
             val index = binding.progressColorRadioGroup.indexOfChild(radioButton)
-            binding.waveformSeekBar.waveProgressColor = when (index) {
+            binding.waveformTimeLine.waveProgressColor = when (index) {
                 0 -> ContextCompat.getColor(this, R.color.red)
                 1 -> ContextCompat.getColor(this, R.color.blue)
                 else -> ContextCompat.getColor(this, R.color.green)
@@ -154,7 +136,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.icGithub.setOnClickListener {
-            val url = "https://github.com/massoudss/waveformSeekBar"
+            val url = "https://github.com/massoudss/waveformTimeLine"
             val i = Intent(Intent.ACTION_VIEW)
             i.data = Uri.parse(url)
             startActivity(i)
@@ -163,6 +145,7 @@ class MainActivity : AppCompatActivity() {
         binding.icImport.setOnClickListener {
             checkStoragePermission()
         }
+
     }
 
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -174,10 +157,9 @@ class MainActivity : AppCompatActivity() {
             progressDialog.setMessage(getString(R.string.message_waiting))
             progressDialog.show()
 
-
             doAsync {
-                binding.waveformSeekBar.setSampleFrom(path!!)
-
+                binding.waveformTimeLine.reset()
+                binding.waveformTimeLine.setSampleFrom(path!!)
                 uiThread {
                     progressDialog.dismiss()
                 }
@@ -207,6 +189,9 @@ class MainActivity : AppCompatActivity() {
             launchSelectAudioActivity()
     }
 
+    override fun onBackPressed() {
+        binding.waveformTimeLine.isPlaying = !binding.waveformTimeLine.isPlaying
+    }
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
@@ -244,13 +229,6 @@ class MainActivity : AppCompatActivity() {
             data[i] = Random().nextInt(data.size)
 
         return data
-    }
-
-    private fun getDummyMarkerSample(): HashMap<Float, String> {
-        val map = hashMapOf<Float, String>()
-        map[binding.waveformSeekBar.maxProgress / 2] = "Middle"
-        map[binding.waveformSeekBar.maxProgress / 4] = "Quarter"
-        return map
     }
 
     companion object {

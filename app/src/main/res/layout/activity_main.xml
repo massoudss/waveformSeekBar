@@ -63,8 +63,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.masoudss.lib.WaveformSeekBar
-                app:wave_progress="33"
+            <com.masoudss.lib.WaveformTimeline
+                app:wave_progress="0"
                 app:wave_max_progress="100"
                 app:wave_width="5dp"
                 app:wave_gap="2dp"
@@ -73,13 +73,13 @@
                 app:wave_background_color="@color/white"
                 app:wave_progress_color="@color/blue"
                 app:wave_gravity="center"
+                app:timestamp_text_size="10dp"
                 android:layout_marginTop="32dp"
                 android:layout_marginBottom="16dp"
-                android:id="@+id/waveformSeekBar"
+                android:id="@+id/waveformTimeLine"
                 android:layout_gravity="center"
                 android:layout_width="300dp"
-                android:layout_height="50dp" />
-
+                android:layout_height="250dp" />
 
             <TextView
                 android:layout_marginTop="16dp"
@@ -168,7 +168,7 @@
 
             <SeekBar
                 android:min="0"
-                android:max="200"
+                android:max="20000"
                 android:progress="0"
                 android:id="@+id/visibleProgress"
                 android:layout_gravity="center"

@@ -46,6 +46,8 @@
         <attr name="marker_text_size"/>
         <attr name="marker_text_color"/>
         <attr name="marker_text_padding"/>
+        <attr name="selection_color" format="color"/>
+        <attr name="selection_stroke_color" format="color"/>
         <attr name="timestamp_color" format="color"/>
         <attr name="timestamp_text_size" format="dimension"/>
     </declare-styleable>

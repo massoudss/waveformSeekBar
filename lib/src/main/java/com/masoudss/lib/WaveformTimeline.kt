@@ -35,15 +35,16 @@ open class WaveformTimeline @JvmOverloads constructor(
     private var mTouchDownX = 0F
     private var mScaledTouchSlop = ViewConfiguration.get(context).scaledTouchSlop
     private var mAlreadyMoved = false
+    private var wasPlaying = false
     private var mPlayer = MediaPlayer()
     private var mTimestampPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private lateinit var progressBitmap: Bitmap
     private lateinit var progressShader: Shader
     private var edit = -1
-    private var selectorStart = Selector()
-    private var selectorEnd = Selector(100)
+    private var selectorStart = Selector(500)
+    private var selectorEnd = Selector(1500)
     private var selecting = false
-
+    private var mSelectorPaint = Paint()
     private var selectionRect = RectF(0f,0f,0f,getAvailableHeight().toFloat())
 
     private var roundedCorner = floatArrayOf(
@@ -115,7 +116,11 @@ open class WaveformTimeline @JvmOverloads constructor(
             invalidate()
         }
 
-    var waveWidth: Float = 1f
+    var waveWidth: Float = 0.5f
+        set(value){
+            field = value
+            invalidate()
+        }
 
     var waveMinHeight: Float = waveWidth
         set(value) {
@@ -153,6 +158,17 @@ open class WaveformTimeline @JvmOverloads constructor(
             invalidate()
         }
 
+    var selectionColor: Int = -16723457
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    var selectionStrokeColor: Int = -16733746
+        set(value) {
+            field = value
+            invalidate()
+        }
     var markerTextSize: Float = Utils.dp(context, 12)
         set(value) {
             field = value
@@ -226,6 +242,8 @@ open class WaveformTimeline @JvmOverloads constructor(
         waveBackgroundColor = ta.getColor(R.styleable.WaveformTimeline_wave_background_color, waveBackgroundColor)
         waveProgressColor = ta.getColor(R.styleable.WaveformTimeline_wave_progress_color, waveProgressColor)
         timestampColor = ta.getColor(R.styleable.WaveformTimeline_timestamp_color, timestampColor)
+        selectionColor = ta.getColor(R.styleable.WaveformTimeline_selection_color, selectionColor)
+        selectionStrokeColor = ta.getColor(R.styleable.WaveformTimeline_selection_stroke_color, selectionStrokeColor)
         progress = ta.getFloat(R.styleable.WaveformTimeline_wave_progress, progress)
         visibleProgress = ta.getFloat(R.styleable.WaveformTimeline_wave_visible_progress, visibleProgress)
         val gravity = ta.getString(R.styleable.WaveformTimeline_wave_gravity)?.toInt() ?: WaveGravity.CENTER.ordinal
@@ -241,6 +259,7 @@ open class WaveformTimeline @JvmOverloads constructor(
         mTimestampPaint.isAntiAlias = true
         mTimestampPaint.strokeWidth = 3F
         mTimestampPaint.textSize = timestampTextSize
+        mSelectorPaint.strokeWidth = 2f
         mPlayer.setOnPreparedListener(onPrepared)
     }
 
@@ -456,16 +475,32 @@ open class WaveformTimeline @JvmOverloads constructor(
                 }
             }
 
-            //TODO Add paint for selector and touch controls
+            if(selectorStart.mills != selectorEnd.mills) {
+                selectionRect.left = millsToPixels(selectorStart.mills)
+                selectionRect.right = millsToPixels(selectorEnd.mills)
+                selectionRect.bottom = height.toFloat()
 
-            selectionRect.left = millsToPixels(selectorStart.mills) - (start*waveWidth)
-            selectionRect.right = millsToPixels(selectorEnd.mills) - (start*waveWidth)
-            selectionRect.bottom = height.toFloat()
-            mMarkerPaint.alpha = 30
-            canvas.drawRoundRect(selectionRect,roundedCorner[0],roundedCorner[0],mMarkerPaint)
+                mSelectorPaint.style = Paint.Style.FILL
+                mSelectorPaint.color = selectionColor
+                mSelectorPaint.alpha = 30
+                canvas.drawRoundRect(
+                    selectionRect,
+                    roundedCorner[0],
+                    roundedCorner[0],
+                    mSelectorPaint
+                )
+
+                mSelectorPaint.color = selectionStrokeColor
+                mSelectorPaint.style = Paint.Style.STROKE
+                mSelectorPaint.alpha = 255
+                canvas.drawRoundRect(
+                    selectionRect,
+                    roundedCorner[0],
+                    roundedCorner[0],
+                    mSelectorPaint
+                )
+            }
         }
-        //TODO REMOVE
-        invalidate()
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -473,39 +508,54 @@ open class WaveformTimeline @JvmOverloads constructor(
         if (!isEnabled)
             return false
 
-        when (event?.action) {
+        event!!
+
+        if(selecting){
+            when(event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    selectorStart.mills = pixelsToMills(event.x)
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    selectorEnd.mills = pixelsToMills(event.x)
+                    Log.e("DEB","${selectorStart.mills}, ${selectorEnd.mills}")
+                    invalidate()
+                }
+                MotionEvent.ACTION_UP ->{
+                    selecting = false
+                }
+            }
+            return true
+        }
+
+        when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-                edit = if(selectorStart.isTouching(event.x))
+                edit = if(isTouching(selectorStart,event.x))
                     0
-                else if(selectorEnd.isTouching(event.x))
+                else if(isTouching(selectorEnd,event.x))
                     1
                 else -1
-                Log.e("DEB","${event.x}")
             }
-            //TODO fix error add the ofset to the event.x (maybe using progress?)
+
             MotionEvent.ACTION_MOVE -> {
                 when(edit) {
                     0 -> {
                         selectorStart.mills = pixelsToMills(event.x)
-                        selectorStart.position = event.x
                     }
                     1 -> {
                         selectorEnd.mills = pixelsToMills(event.x)
-                        selectorEnd.position = event.x
                     }
                 }
+                invalidate()
             }
 
-            MotionEvent.ACTION_UP ->{
-                edit = -1
-            }
         }
 
         if(edit == -1)
             if (visibleProgress > 0) {
-            when (event?.action) {
+            when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    mPlayer.pause()
+                    wasPlaying = isPlaying
+                    isPlaying = false
                     mTouchDownX = event.x
                     mAlreadyMoved = false
                 }
@@ -517,19 +567,25 @@ open class WaveformTimeline @JvmOverloads constructor(
                 }
                 MotionEvent.ACTION_UP -> {
                     mPlayer.seekTo(getProgress(event).toInt())
+                    if(wasPlaying){
+                        isPlaying = true
+                        wasPlaying = false
+                    }
                     performClick()
                 }
             }
         } else {
-                when (event?.action) {
+                when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     if (isParentScrolling()) {
                         mTouchDownX = event.x
-                        mPlayer.pause()
+                        wasPlaying = isPlaying
+                        isPlaying = false
                     }
                     else {
                         updateProgress(event)
-                        mPlayer.pause()
+                        wasPlaying = isPlaying
+                        isPlaying = false
                     }
                 }
                 MotionEvent.ACTION_MOVE -> {
@@ -539,22 +595,14 @@ open class WaveformTimeline @JvmOverloads constructor(
                     if (abs(event.x - mTouchDownX) > mScaledTouchSlop) {
                         updateProgress(event)
                         mPlayer.seekTo(getProgress(event).toInt())
+                        if(wasPlaying){
+                            isPlaying = true
+                            wasPlaying = false
+                        }
                     }
                     performClick()
                 }
             }
-        }
-
-        if(selecting){
-            when(event?.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    selectorStart.position = event.x
-                }
-                MotionEvent.ACTION_UP -> {
-                    selectorEnd.position = event.x
-                }
-            }
-            selecting = false
         }
 
         return true
@@ -610,11 +658,17 @@ open class WaveformTimeline @JvmOverloads constructor(
     }
 
     private fun millsToPixels(mills: Long): Float {
-        return (mills / visibleProgress) * getAvailableWidth()
+        val offset = (progress - visibleProgress / 2)
+        return ((mills-offset) / visibleProgress) * getAvailableWidth()
     }
 
     private fun pixelsToMills(pixel: Float): Long {
         val offset = (progress - visibleProgress / 2)
         return (visibleProgress * (pixel / getAvailableWidth()) + offset).toLong()
+    }
+
+    private fun isTouching(selector: Selector,touchPosition: Float): Boolean{
+        val distance = abs(millsToPixels(selector.mills) - touchPosition)
+        return distance < selector.distanceThreshold
     }
 }

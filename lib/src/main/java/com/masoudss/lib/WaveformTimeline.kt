@@ -119,6 +119,7 @@ open class WaveformTimeline @JvmOverloads constructor(
     var waveWidth: Float = 0.5f
         set(value){
             field = value
+            updateSecondDistance(visibleProgress)
             invalidate()
         }
 
@@ -185,6 +186,7 @@ open class WaveformTimeline @JvmOverloads constructor(
     var visibleProgress: Float = 0F
         set(value) {
             field = value
+            updateSecondDistance(value)
             invalidate()
         }
 
@@ -441,7 +443,7 @@ open class WaveformTimeline @JvmOverloads constructor(
             }
 
             //Draw timestamps
-            val nTimestamp = if(visibleProgress != 0f) {
+            val nTimestamp = if(zoomed()) {
                 visibleProgress / 1000
             } else {
                 maxProgress / 1000
@@ -656,6 +658,15 @@ open class WaveformTimeline @JvmOverloads constructor(
         onProgressChanged?.onProgressChanged(this, progress, true)
     }
 
+    private fun updateSecondDistance(visibleProgress: Float){
+
+        val timestampSize = mTimestampPaint.measureText("0:00")
+        timestampSecondDistance =
+            if(zoomed())
+                ( (visibleProgress/1000) / (width / (timestampSize * 1.5f)) ).toInt()
+            else
+                ( (maxProgress/1000) / (width / (timestampSize * 1.5f)) ).toInt()
+    }
     private fun getProgress(event: MotionEvent): Float {
         return if (zoomed()) {
             (mPlayer.currentPosition - visibleProgress * (event.x - mTouchDownX) / getAvailableWidth()).coerceIn(

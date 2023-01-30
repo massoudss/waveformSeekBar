@@ -228,6 +228,8 @@ open class WaveformTimeline @JvmOverloads constructor(
     private val onPrepared = OnPreparedListener {
         setMaxValue()
         maxProgress = mPlayer.duration.toFloat()
+        isPlaying = true
+        isPlaying = false
         invalidate()
     }
 
@@ -303,6 +305,11 @@ open class WaveformTimeline @JvmOverloads constructor(
     fun reset(){
         mPlayer.reset()
     }
+
+    fun seekTo(mills: Int){
+        mPlayer.seekTo(mills)
+    }
+
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         mCanvasWidth = w
@@ -516,13 +523,13 @@ open class WaveformTimeline @JvmOverloads constructor(
                     if(zoomed())
                         selectorStart.mills = pixelsToMills(event.x)
                     else
-                        selectorStart.mills = ((maxProgress/width)*event.x).toLong()
+                        selectorStart.mills = pixelsToMillsFlat(event.x)
                 }
                 MotionEvent.ACTION_MOVE -> {
                     if(zoomed())
                         selectorEnd.mills = pixelsToMills(event.x)
                     else
-                        selectorEnd.mills = ((maxProgress/width)*event.x).toLong()
+                        selectorEnd.mills = pixelsToMillsFlat(event.x)
                     invalidate()
                 }
                 MotionEvent.ACTION_UP ->{

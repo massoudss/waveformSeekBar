@@ -37,6 +37,7 @@ open class WaveformSeekBar @JvmOverloads constructor(
     private lateinit var progressShader: Shader
 
     var onProgressChanged: SeekBarOnProgressChanged? = null
+    var onCompletionListener: CompletionListener? = null
 
     var sample: IntArray? = null
         set(value) {
@@ -248,6 +249,8 @@ open class WaveformSeekBar @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         sample?.let { waveSample ->
+            onCompletionListener?.onComplete()
+
             if (waveSample.isEmpty())
                 return
 

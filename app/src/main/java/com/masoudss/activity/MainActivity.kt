@@ -15,7 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.masoudss.R
 import com.masoudss.databinding.ActivityMainBinding
-import com.masoudss.lib.CompletionListener
+import com.masoudss.lib.DrawCompletionListener
 import com.masoudss.lib.SeekBarOnProgressChanged
 import com.masoudss.lib.WaveformSeekBar
 import com.masoudss.lib.utils.Utils
@@ -55,9 +55,9 @@ class MainActivity : AppCompatActivity() {
                         binding.waveProgress.progress = progress.toInt()
                 }
             }
-            onCompletionListener = object : CompletionListener {
-                override fun onComplete() {
-                    Toast.makeText(this@MainActivity, "onComplete", Toast.LENGTH_SHORT).show()
+            onCompletionListener = object : DrawCompletionListener {
+                override fun onDrawComplete() {
+                    Toast.makeText(this@MainActivity, "onDrawComplete", Toast.LENGTH_SHORT).show()
                 }
             }
         }

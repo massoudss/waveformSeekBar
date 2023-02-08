@@ -35,6 +35,7 @@ open class WaveformSeekBar @JvmOverloads constructor(
     private var mAlreadyMoved = false
     private lateinit var progressBitmap: Bitmap
     private lateinit var progressShader: Shader
+    private var mOnCompleteCalled = false
 
     var onProgressChanged: SeekBarOnProgressChanged? = null
     var onCompletionListener: DrawCompletionListener? = null
@@ -369,7 +370,10 @@ open class WaveformSeekBar @JvmOverloads constructor(
                 canvas.rotate(-90f)
             }
 
-            onCompletionListener?.onDrawComplete()
+            if(!mOnCompleteCalled) {
+                mOnCompleteCalled = true
+                onCompletionListener?.onDrawComplete()
+            }
         }
     }
 

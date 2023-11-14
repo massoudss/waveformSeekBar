@@ -206,8 +206,8 @@ open class WaveformSeekBar @JvmOverloads constructor(
         mMaxValue = sample?.maxOrNull() ?: 0
     }
 
-    fun setMaxAmplitude(maxAmp: Int) {
-        mMaxValue = max(maxAmp, 0)
+    fun setMaxValue(maxVal: Int) {
+        mMaxValue = max(maxVal, 0)
     }
 
     @ThreadBlocking

@@ -15,6 +15,7 @@ import com.masoudss.lib.utils.WaveformOptions
 import java.io.File
 import kotlin.math.abs
 import kotlin.math.floor
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 open class WaveformSeekBar @JvmOverloads constructor(
@@ -203,6 +204,10 @@ open class WaveformSeekBar @JvmOverloads constructor(
 
     private fun setMaxValue() {
         mMaxValue = sample?.maxOrNull() ?: 0
+    }
+
+    fun setMaxValue(maxVal: Int) {
+        mMaxValue = max(maxVal, 0)
     }
 
     @ThreadBlocking

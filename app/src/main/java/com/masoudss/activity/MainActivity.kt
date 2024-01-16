@@ -16,12 +16,13 @@ import androidx.core.content.ContextCompat
 import com.masoudss.R
 import com.masoudss.databinding.ActivityMainBinding
 import com.masoudss.lib.SeekBarOnProgressChanged
+import com.masoudss.lib.SeekBarOnTouchListener
 import com.masoudss.lib.WaveformSeekBar
 import com.masoudss.lib.utils.Utils
 import com.masoudss.lib.utils.WaveGravity
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
-import java.util.*
+import java.util.Random
 
 class MainActivity : AppCompatActivity() {
 
@@ -52,6 +53,11 @@ class MainActivity : AppCompatActivity() {
                 ) {
                     if (fromUser)
                         binding.waveProgress.progress = progress.toInt()
+                }
+            }
+            onActionSeekBarChanged = object : SeekBarOnTouchListener {
+                override fun onActionSeekBar(action: Int) {
+                    //this is just an example of use
                 }
             }
         }

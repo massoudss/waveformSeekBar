@@ -37,6 +37,7 @@ open class WaveformSeekBar @JvmOverloads constructor(
     private lateinit var progressShader: Shader
 
     var onProgressChanged: SeekBarOnProgressChanged? = null
+    var onActionSeekBarChanged: SeekBarOnTouchListener? = null
 
     var sample: IntArray? = null
         set(value) {
@@ -376,32 +377,41 @@ open class WaveformSeekBar @JvmOverloads constructor(
         if (visibleProgress > 0) {
             when (event?.action) {
                 MotionEvent.ACTION_DOWN -> {
+                    updateActionSeekBar(MotionEvent.ACTION_DOWN)
                     mTouchDownX = event.x
                     mProgress = progress
                     mAlreadyMoved = false
                 }
                 MotionEvent.ACTION_MOVE -> {
                     if (abs(event.x - mTouchDownX) > mScaledTouchSlop || mAlreadyMoved) {
+                        updateActionSeekBar(MotionEvent.ACTION_MOVE)
                         updateProgress(event)
                         mAlreadyMoved = true
                     }
                 }
                 MotionEvent.ACTION_UP -> {
+                    updateActionSeekBar(MotionEvent.ACTION_UP)
                     performClick()
+                }
+                MotionEvent.ACTION_CANCEL -> {
+                    updateActionSeekBar(MotionEvent.ACTION_CANCEL)
                 }
             }
         } else {
             when (event?.action) {
                 MotionEvent.ACTION_DOWN -> {
+                    updateActionSeekBar(MotionEvent.ACTION_DOWN)
                     if (isParentScrolling())
                         mTouchDownX = event.x
                     else
                         updateProgress(event)
                 }
                 MotionEvent.ACTION_MOVE -> {
+                    updateActionSeekBar(MotionEvent.ACTION_MOVE)
                     updateProgress(event)
                 }
                 MotionEvent.ACTION_UP -> {
+                    updateActionSeekBar(MotionEvent.ACTION_UP)
                     if (abs(event.x - mTouchDownX) > mScaledTouchSlop)
                         updateProgress(event)
                     performClick()
@@ -410,7 +420,6 @@ open class WaveformSeekBar @JvmOverloads constructor(
         }
         return true
     }
-
     private fun isParentScrolling(): Boolean {
         var parent = parent as View
         val root = rootView
@@ -426,6 +435,8 @@ open class WaveformSeekBar @JvmOverloads constructor(
             parent = parent.parent as View
         }
     }
+
+    private fun updateActionSeekBar(action: Int) = onActionSeekBarChanged?.onActionSeekBar(action)
 
     private fun updateProgress(event: MotionEvent) {
         progress = getProgress(event);

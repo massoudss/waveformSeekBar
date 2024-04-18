@@ -3,11 +3,11 @@ apply plugin: 'kotlin-android'
 
 android {
     namespace 'com.masoudss.lib'
-    compileSdkVersion 32
+    compileSdk 34
     ndkVersion "21.1.6352462"
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 32
+        targetSdkVersion 34
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -18,12 +18,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "androidx.appcompat:appcompat:1.4.2"
-    compileOnly 'com.github.lincollincol:amplituda:2.1.0'
+    implementation "androidx.appcompat:appcompat:1.6.1"
+    compileOnly 'com.github.lincollincol:amplituda:2.2.2'
 }
 repositories {
     mavenCentral()

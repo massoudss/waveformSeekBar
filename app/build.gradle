@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 32
-    ndkVersion "21.1.6352462"
     namespace 'com.masoudss'
+    compileSdk 34
+    ndkVersion "21.1.6352462"
     defaultConfig {
         applicationId "com.masoudss"
         minSdkVersion 21
-        targetSdkVersion 32
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -28,17 +28,21 @@ android {
             useLegacyPackaging false
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.6.0-alpha04'
-    implementation 'androidx.core:core-ktx:1.9.0-alpha04'
-    implementation 'com.google.android.material:material:1.7.0-alpha02'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.core:core-ktx:1.13.0'
+    implementation 'com.google.android.material:material:1.11.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation "org.jetbrains.anko:anko-commons:0.10.0"
 
     implementation project(':lib')
-    implementation 'com.github.lincollincol:amplituda:2.1.0'
+    implementation 'com.github.lincollincol:amplituda:2.2.2'
 
 }

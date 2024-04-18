@@ -19,9 +19,11 @@ import com.masoudss.lib.SeekBarOnProgressChanged
 import com.masoudss.lib.WaveformSeekBar
 import com.masoudss.lib.utils.Utils
 import com.masoudss.lib.utils.WaveGravity
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
-import java.util.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
+import java.util.Random
 
 class MainActivity : AppCompatActivity() {
 
@@ -174,11 +176,9 @@ class MainActivity : AppCompatActivity() {
             progressDialog.setMessage(getString(R.string.message_waiting))
             progressDialog.show()
 
-
-            doAsync {
+            GlobalScope.async(Dispatchers.Default) {
                 binding.waveformSeekBar.setSampleFrom(path!!)
-
-                uiThread {
+                withContext(Dispatchers.Main) {
                     progressDialog.dismiss()
                 }
             }

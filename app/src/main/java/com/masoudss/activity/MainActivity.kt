@@ -186,7 +186,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkStoragePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            val hasReadPermission = checkSelfPermission(Manifest.permission.READ_MEDIA_AUDIO)
+
+            val permissions = ArrayList<String>()
+
+            if (hasReadPermission != PackageManager.PERMISSION_GRANTED)
+                permissions.add(Manifest.permission.READ_MEDIA_AUDIO)
+
+            if (permissions.isNotEmpty())
+                requestPermissions(permissions.toTypedArray(), REQ_CODE_STORAGE_PERMISSION)
+            else
+                launchSelectAudioActivity()
+        }
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val hasReadPermission = checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
             val hasWritePermission = checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
 

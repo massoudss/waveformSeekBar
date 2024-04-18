@@ -2,9 +2,9 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
+    namespace 'com.masoudss.lib'
     compileSdkVersion 32
     ndkVersion "21.1.6352462"
-
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 32
@@ -18,7 +18,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
 }
 
 dependencies {

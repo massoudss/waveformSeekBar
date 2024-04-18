@@ -4,7 +4,7 @@ apply plugin: 'kotlin-android'
 android {
     compileSdkVersion 32
     ndkVersion "21.1.6352462"
-
+    namespace 'com.masoudss'
     defaultConfig {
         applicationId "com.masoudss"
         minSdkVersion 21
@@ -22,6 +22,11 @@ android {
 
     buildFeatures {
         viewBinding true
+    }
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging false
+        }
     }
 }
 

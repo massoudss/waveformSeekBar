@@ -2,7 +2,9 @@ package com.masoudss.lib.utils
 
 import android.content.ContentResolver
 import android.content.Context
+import android.database.Cursor
 import android.net.Uri
+import android.provider.OpenableColumns
 import android.util.TypedValue
 import android.webkit.MimeTypeMap
 import java.io.File
@@ -38,5 +40,20 @@ fun Context.uriToFile(uri: Uri): File? {
 }
 
 
-fun ContentResolver.getUriExtension(uri: Uri) = MimeTypeMap.getSingleton()
-    .getMimeTypeFromExtension(getType(uri))
+fun ContentResolver.getUriExtension(uri: Uri): String? {
+    getType(uri)?.let { type ->
+        return MimeTypeMap.getSingleton().getExtensionFromMimeType(type)
+    }
+
+    var cursor: Cursor? = null
+    return try {
+        cursor = query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
+        cursor?.takeIf { it.moveToFirst() }?.getString(0)
+            ?.substringAfterLast('.', missingDelimiterValue = "")
+            ?.takeIf { it.isNotEmpty() }
+    } catch (_: Exception) {
+        null
+    } finally {
+        cursor?.close()
+    }
+}

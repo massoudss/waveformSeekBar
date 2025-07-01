@@ -19,9 +19,11 @@ import com.masoudss.lib.SeekBarOnProgressChanged
 import com.masoudss.lib.WaveformSeekBar
 import com.masoudss.lib.utils.Utils
 import com.masoudss.lib.utils.WaveGravity
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
-import java.util.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
+import java.util.Random
 
 class MainActivity : AppCompatActivity() {
 
@@ -174,11 +176,9 @@ class MainActivity : AppCompatActivity() {
             progressDialog.setMessage(getString(R.string.message_waiting))
             progressDialog.show()
 
-
-            doAsync {
+            GlobalScope.async(Dispatchers.Default) {
                 binding.waveformSeekBar.setSampleFrom(path!!)
-
-                uiThread {
+                withContext(Dispatchers.Main) {
                     progressDialog.dismiss()
                 }
             }
@@ -186,7 +186,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkStoragePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            val hasReadPermission = checkSelfPermission(Manifest.permission.READ_MEDIA_AUDIO)
+
+            val permissions = ArrayList<String>()
+
+            if (hasReadPermission != PackageManager.PERMISSION_GRANTED)
+                permissions.add(Manifest.permission.READ_MEDIA_AUDIO)
+
+            if (permissions.isNotEmpty())
+                requestPermissions(permissions.toTypedArray(), REQ_CODE_STORAGE_PERMISSION)
+            else
+                launchSelectAudioActivity()
+        }
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val hasReadPermission = checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
             val hasWritePermission = checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
 

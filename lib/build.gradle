@@ -34,7 +34,7 @@ tasks.withType(KotlinCompile).configureEach {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "androidx.appcompat:appcompat:1.6.1"
+    implementation "androidx.appcompat:appcompat:1.7.1"
     compileOnly 'com.github.lincollincol:amplituda:2.2.2'
 }
 repositories {

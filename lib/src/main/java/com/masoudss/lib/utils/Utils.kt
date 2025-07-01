@@ -37,8 +37,6 @@ fun Context.uriToFile(uri: Uri): File? {
     }
 }
 
-fun ContentResolver.readUriBytes(uri: Uri) = openInputStream(uri)
-    ?.buffered()?.use { it.readBytes() }
 
 fun ContentResolver.getUriExtension(uri: Uri) = MimeTypeMap.getSingleton()
     .getMimeTypeFromExtension(getType(uri))

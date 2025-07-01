@@ -6,7 +6,7 @@ import android.net.Uri
 import android.util.TypedValue
 import android.webkit.MimeTypeMap
 import java.io.File
-import java.util.*
+import java.util.UUID
 
 object Utils {
 
@@ -21,13 +21,20 @@ object Utils {
 
 }
 
-fun Context.uriToFile(uri: Uri) = with(contentResolver) {
-    val data = readUriBytes(uri) ?: return@with null
-    val extension = getUriExtension(uri)
-    File(
-        cacheDir.path,
-        "${UUID.randomUUID()}.$extension"
-    ).also { audio -> audio.writeBytes(data) }
+fun Context.uriToFile(uri: Uri): File? {
+    val extension = contentResolver.getUriExtension(uri) ?: return null
+    val tempFile = File(cacheDir, "${UUID.randomUUID()}.$extension")
+
+    return try {
+        contentResolver.openInputStream(uri)?.use { input ->
+            tempFile.outputStream().use { output ->
+                input.copyTo(output)
+            }
+            tempFile
+        }
+    } catch (e: Exception) {
+        null
+    }
 }
 
 fun ContentResolver.readUriBytes(uri: Uri) = openInputStream(uri)
